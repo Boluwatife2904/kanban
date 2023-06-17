@@ -4,3 +4,27 @@ body {
 	line-height: 1.5;
 	font-size: 1.5rem;
 }
+
+.heading-xl {
+	@include typeface(700, 2.4rem, 3rem);
+}
+
+.heading-l {
+	@include typeface(700, 1.8rem, 2.3rem);
+}
+
+.heading-m {
+	@include typeface(700, 1.5rem, 1.9rem);
+}
+
+.heading-s {
+	@include typeface(700, 1.2rem, 1.5rem);
+}
+
+.body-l {
+	@include typeface(500, 1.3rem, 2.3rem);
+}
+
+.body-m {
+	@include typeface(700, 1.2rem, 1.5rem);
+}

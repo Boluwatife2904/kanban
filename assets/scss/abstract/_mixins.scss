@@ -1,0 +1,5 @@
+@mixin typeface($font-weight, $font-size, $line-height) {
+	font-weight: $font-weight;
+	font-size: $font-size;
+	line-height: $line-height;
+}

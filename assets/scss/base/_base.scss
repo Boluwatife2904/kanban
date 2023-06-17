@@ -6,6 +6,10 @@
 	box-sizing: inherit;
 }
 
+* {
+    transition: all .3s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
 html {
     min-height: 100vh;
 	scroll-behavior: smooth;
@@ -14,6 +18,7 @@ html {
 
 body {
 	box-sizing: border-box;
+    background-color: var(--body-background);
 
 	&.overflow-hidden {
 		overflow: hidden;

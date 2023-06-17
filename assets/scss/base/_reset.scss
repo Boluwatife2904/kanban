@@ -12,6 +12,22 @@ textarea {
 	resize: none;
 }
 
-button:disabled {
-	cursor: not-allowed;
+input,
+textarea,
+button {
+	font: inherit;
+}
+
+button {
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+	}
 }

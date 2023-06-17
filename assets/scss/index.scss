@@ -1,4 +1,10 @@
 // BASE
 @import "./base/base";
 @import "./base/reset";
-@import "./base/typography"
+@import "./base/typography";
+@import "./base/utilities";
+@import "./base/animations";
+
+// ABSTRACT
+@import "./abstract/mixins";
+@import "./abstract/variables";

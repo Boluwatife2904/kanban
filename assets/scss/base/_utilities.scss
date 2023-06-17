@@ -1,0 +1,81 @@
+$displays: block, inline-block, grid, flex, inline-flex;
+@each $display in $displays {
+	.#{$display} {
+		display: $display;
+	}
+}
+
+$positions: relative, absolute, fixed;
+@each $position in $positions {
+	.position-#{$position} {
+		position: $position;
+	}
+}
+
+$flex-wraps: wrap, nowrap;
+@each $wrap in $flex-wraps {
+	.#{$wrap} {
+		flex-wrap: $wrap;
+	}
+}
+
+$flex-directions: column;
+@each $direction in $flex-directions {
+	.flex-#{$direction} {
+		flex-direction: $direction;
+	}
+}
+
+$items-alignment: center, space-between;
+@each $alignment in $items-alignment {
+	.items-#{$alignment} {
+		align-items: $alignment;
+	}
+}
+
+$content-justification: center;
+@each $justification in $content-justification {
+	.content-#{$justification} {
+		justify-content: $justification;
+	}
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.border-xs {
+	border-radius: 0.4rem;
+}
+
+.border-s {
+	border-radius: 0.6rem;
+}
+
+.border-m {
+	border-radius: 0.8rem;
+}
+
+.border-l {
+	border-radius: 1.2rem;
+}
+
+.border-rounded {
+	border-radius: 50%;
+}
+
+.primary-text {
+    color: var(--primary-text);
+}
+
+.medium-grey-text {
+    color: var(--medium-grey-text);
+}
+
+.destructive-text {
+    color: var(--destructive-color);
+}

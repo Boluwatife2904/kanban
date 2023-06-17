@@ -1,0 +1,28 @@
+/* Define styles for the default root window element */
+:root {
+	--primary-color: #635fc7;
+	--primary-color-hover: #a8a4ff;
+	--secondary-color: rgba(99, 95, 199, 0.1);
+	--secondary-color-hover: rgba(99, 95, 199, 0.25);
+	--destructive-color: #ea5555;
+	--destructive-color-hover: #ff9898;
+
+	--white-background: #ffffff;
+	--medium-grey-text: #828fa3;
+	--body-background: #ffffff;
+	--label-color: #828fa3;
+	--primary-text: #000112;
+	--light-grey-background: #f4f7fd;
+}
+
+/* Define styles for the root window with dark - mode preference */
+:root.dark-theme {
+	--white-background: #20212c;
+	--body-background: #2b2c37;
+	--label-color: #ffffff;
+	--primary-text: #ffffff;
+	--light-grey-background: #20212c;
+
+    --secondary-color: #fff;
+	--secondary-color-hover: #fff;
+}
