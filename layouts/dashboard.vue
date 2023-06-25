@@ -19,6 +19,9 @@ const sidebarIsHidden = ref(false);
 
 <style lang="scss" scoped>
 .dashboard {
+	height: 100vh;
+    overflow-y: hidden;
+
 	@media screen and (min-width: 768px) {
 		grid-template-columns: 26.1rem auto;
 	}
@@ -46,6 +49,7 @@ const sidebarIsHidden = ref(false);
 		width: 100%;
 		min-height: 100vh;
 		background-color: var(--light-grey-background);
+        overflow-y: scroll;
 	}
 }
 
@@ -62,8 +66,8 @@ const sidebarIsHidden = ref(false);
 		display: block;
 	}
 
-    &:hover {
-        background-color: var(--primary-color-hover);
-    }
+	&:hover {
+		background-color: var(--primary-color-hover);
+	}
 }
 </style>

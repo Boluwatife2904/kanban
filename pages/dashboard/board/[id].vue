@@ -22,6 +22,9 @@ definePageMeta({
 				<button><IconsEllipsis /></button>
 			</div>
 		</div>
+		<div class="single-board__body flex flex-column items-center content-center">
+			<TheEmptyState />
+		</div>
 	</div>
 </template>
 
@@ -31,6 +34,9 @@ definePageMeta({
 		background-color: var(--sidebar-background);
 		padding: 2rem 3.2rem 2.8rem 2.4rem;
 		border-bottom: 0.1rem solid var(--lines-color);
+		position: sticky;
+		top: 0;
+		left: 0;
 
 		&--right {
 			gap: 1.6rem;
@@ -47,6 +53,11 @@ definePageMeta({
 				padding: 1.4rem 2.4rem;
 			}
 		}
+	}
+
+	&__body {
+		min-height: calc(100vh - 10rem);
+        padding: 2.4rem 0 5rem 2.4rem;
 	}
 }
 </style>

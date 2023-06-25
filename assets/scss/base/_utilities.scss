@@ -40,6 +40,13 @@ $content-justification: center, space-between;
 	}
 }
 
+$text-alignments: center, justify;
+@each $alignment in $text-alignments {
+	.text-#{$alignment} {
+		text-align: $alignment;
+	}
+}
+
 .cursor-pointer {
 	cursor: pointer;
 }
