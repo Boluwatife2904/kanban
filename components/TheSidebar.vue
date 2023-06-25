@@ -1,8 +1,50 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const modelValue = defineModel<boolean>();
+const boards = [
+	{ id: "1", title: "Platform Launch" },
+	{ id: "2", title: "Marketing Plan" },
+	{ id: "3", title: "Roadmap" },
+];
+</script>
 
 <template>
-	<aside></aside>
+	<aside class="sidebar flex flex-column">
+		<div class="sidebar__logo">
+			<TheLogo />
+		</div>
+        <DashboardBoards />
+		<div class="sidebar__theme">
+			<ThemeToggler />
+		</div>
+		<div class="sidebar__toggler">
+			<button class="boards__item heading-m flex items-center w-100" @click="modelValue = !modelValue">
+				<IconsEye />
+				Hide Sidebar
+			</button>
+		</div>
+	</aside>
 </template>
 
+<style lang="scss" scoped>
+.sidebar {
+	height: 100vh;
+	background-color: var(--sidebar-background);
+    border-right: 0.1rem solid var(--lines-color);
 
-<style scoped></style>
+	&__logo {
+		padding: 3.2rem 2.6rem;
+		margin-bottom: 2.8rem;
+	}
+
+	&__theme {
+		margin-top: auto;
+		padding: 0 2.4rem;
+	}
+
+	&__toggler {
+		margin-top: 0.8rem;
+		padding-right: 2.4rem;
+		padding-bottom: 4.7rem;
+	}
+}
+</style>

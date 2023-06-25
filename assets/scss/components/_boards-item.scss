@@ -1,0 +1,22 @@
+.boards__item {
+	gap: 1.6rem;
+	padding: 1.4rem 0 1.4rem 3.2rem;
+	color: var(--medium-grey-text);
+	border-top-right-radius: 10rem;
+	border-bottom-right-radius: 10rem;
+
+	&--active {
+		background-color: var(--primary-color) !important;
+		color: #fff !important;
+	}
+
+	&:hover {
+		background: var(--secondary-color);
+		color: var(--primary-color);
+	}
+
+	&--add {
+		color: var(--primary-color) !important;
+		background-color: transparent !important;
+	}
+}

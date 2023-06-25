@@ -51,7 +51,7 @@ const buttonClasses = computed(() => {
 
 	&--large {
 		border-radius: 2.4rem;
-		padding: 1.5rem;
+		padding: 1.5rem 2.4rem;
 		@include typeface(700, 1.5rem, 1.9rem);
 	}
 

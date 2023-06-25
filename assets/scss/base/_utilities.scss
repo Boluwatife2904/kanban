@@ -33,7 +33,7 @@ $items-alignment: center, space-between;
 	}
 }
 
-$content-justification: center;
+$content-justification: center, space-between;
 @each $justification in $content-justification {
 	.content-#{$justification} {
 		justify-content: $justification;
@@ -69,13 +69,29 @@ $content-justification: center;
 }
 
 .primary-text {
-    color: var(--primary-text);
+	color: var(--primary-text);
 }
 
 .medium-grey-text {
-    color: var(--medium-grey-text);
+	color: var(--medium-grey-text);
 }
 
 .destructive-text {
-    color: var(--destructive-color);
+	color: var(--destructive-color);
+}
+
+.hide-on-desktop {
+	display: block;
+
+	@media screen and (min-width: 768px) {
+		display: none;
+	}
+}
+
+.hide-on-mobile {
+	display: none;
+
+	@media screen and (min-width: 768px) {
+		display: block;
+	}
 }

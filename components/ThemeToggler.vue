@@ -1,20 +1,12 @@
 <script setup lang="ts">
-const isDarkMode = ref(false);
-
-watch(isDarkMode, (newValue) => {
-	if (newValue) {
-		document.documentElement.classList.add("dark-theme");
-	} else {
-		document.documentElement.classList.remove("dark-theme");
-	}
-});
+const { selectedTheme, toggleTheme } = useTheme();
 </script>
 
 <template>
 	<div class="theme-toggler flex items-center content-center border-s">
 		<span><IconsTheme variant="light" /></span>
-		<button class="theme-toggler__button border-l" @click="isDarkMode = !isDarkMode">
-			<span class="theme-toggler__button__inner block border-rounded" :class="{ 'theme-toggler__button__inner--active': isDarkMode }"></span>
+		<button class="theme-toggler__button border-l" @click="toggleTheme">
+			<span class="theme-toggler__button__inner block border-rounded" :class="{ 'theme-toggler__button__inner--active': selectedTheme === 'dark-mode' }"></span>
 		</button>
 		<span><IconsTheme variant="dark" /></span>
 	</div>
@@ -22,7 +14,7 @@ watch(isDarkMode, (newValue) => {
 
 <style lang="scss" scoped>
 .theme-toggler {
-	max-width: 25.1rem;
+	max-width: 23.5rem;
 	background-color: var(--light-grey-background);
 	gap: 2.4rem;
 	padding: 1.4rem;

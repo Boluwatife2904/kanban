@@ -13,16 +13,20 @@
 	--label-color: #828fa3;
 	--primary-text: #000112;
 	--light-grey-background: #f4f7fd;
+	--sidebar-background: #ffffff;
+	--lines-color: #e4ebfa;
 }
 
 /* Define styles for the root window with dark - mode preference */
-:root.dark-theme {
+:root.dark-mode {
 	--white-background: #20212c;
 	--body-background: #2b2c37;
 	--label-color: #ffffff;
 	--primary-text: #ffffff;
 	--light-grey-background: #20212c;
+	--sidebar-background: #2b2c37;
+	--lines-color: #3e3f4e;
 
-    --secondary-color: #fff;
+	--secondary-color: #fff;
 	--secondary-color-hover: #fff;
 }
