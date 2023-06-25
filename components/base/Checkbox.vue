@@ -1,6 +1,8 @@
 <script setup lang="ts">
 interface CheckboxProps {
+    id: string;
 	label?: string;
+    name: string;
 }
 
 defineProps<CheckboxProps>();
@@ -9,8 +11,8 @@ const modelValue = defineModel<boolean>();
 </script>
 
 <template>
-	<label for="checkbox" class="checkbox border-xs w-100 inline-flex items-center">
-		<input id="checkbox" type="checkbox" v-model="modelValue" :checked="modelValue" />
+	<label :for="id" class="checkbox border-xs w-100 inline-flex items-center">
+		<input :id="id" type="checkbox" v-model="modelValue" :checked="modelValue" />
 		<div class="box bg-white flex content-center items-center"></div>
 		<span class="body-m checkbox__label" :class="{ 'checkbox__label--checked': modelValue }"> {{ label }} </span>
 	</label>

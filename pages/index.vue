@@ -40,13 +40,13 @@ const showModal = ref(false);
 		<div class="grid-wrapper grid">
 			<div class="form-check">
 				<span class="body-m block item-header">Subtask Checkbox</span>
-				<BaseCheckbox v-model="isSelected" label="Complete this project" />
+				<BaseCheckbox v-model="isSelected" id="completeProject" name="completeProject" label="Complete this project" />
 			</div>
 			<BaseInput v-model="selectedText" id="field" name="field" label="Text Field (active)" placeholder="Enter task name" />
 			<BaseDropdown v-model="selectedItem" label="Dropdown (idle)" :options="options" />
 		</div>
 	</div>
-	<LazyBaseModal v-model="showModal">
+	<LazyBaseModal :show="showModal" @close-modal="showModal = false">
 		<template #header>
 			<span class="heading-l destructive-text">Delete this task?</span>
 		</template>

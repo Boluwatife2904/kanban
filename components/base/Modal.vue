@@ -1,14 +1,20 @@
 <script setup lang="ts">
-interface ModalProps {}
+interface ModalProps {
+	show: boolean;
+}
 
-defineProps<ModalProps>();
+interface ModalEmits {
+	(event: "close-modal"): void;
+}
 
-const modelValue = defineModel<boolean>();
+const props = defineProps<ModalProps>();
+const emits = defineEmits<ModalEmits>();
+
 const showModalContent = ref(false);
 
 onMounted(() => {
 	watchEffect(() => {
-		if (modelValue.value) {
+		if (props.show) {
 			showModalContent.value = true;
 			document.body.classList.add("overflow-hidden");
 		} else {
@@ -20,7 +26,7 @@ onMounted(() => {
 const closeModal = () => {
 	showModalContent.value = false;
 	setTimeout(() => {
-		modelValue.value = false;
+		emits("close-modal");
 	}, 50);
 };
 </script>
@@ -28,7 +34,7 @@ const closeModal = () => {
 <template>
 	<Teleport to="body">
 		<Transition name="fade" mode="out-in" :appear="true">
-			<div v-if="modelValue" class="modal position-fixed w-100 flex items-center content-center" @click.self="closeModal">
+			<div v-if="show" class="modal position-fixed w-100 flex items-center content-center" @click.self="closeModal">
 				<div class="modal__wrapper flex flex-column w-100 items-center content-center">
 					<Transition name="slidein" mode="out-in" :appear="true">
 						<div v-if="showModalContent" class="modal__body flex flex-column w-100 border-s">
@@ -65,11 +71,13 @@ const closeModal = () => {
 	&__body {
 		margin: 0;
 		padding: 3.2rem;
-		background-color: var(--white-background);
+		background-color: var(--body-background);
 	}
 
-    &__header {
-        margin-bottom: 2.4rem;
-    }
+	&__header {
+		&:not(:empty) {
+			margin-bottom: 2.4rem;
+		}
+	}
 }
 </style>

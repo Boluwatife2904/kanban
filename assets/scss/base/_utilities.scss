@@ -47,6 +47,13 @@ $text-alignments: center, justify;
 	}
 }
 
+$text-transformations: capitalize, uppercase;
+@each $transformation in $text-transformations {
+	.text-#{$transformation} {
+		text-transform: $transformation;
+	}
+}
+
 .cursor-pointer {
 	cursor: pointer;
 }
