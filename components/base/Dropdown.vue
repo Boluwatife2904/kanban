@@ -28,22 +28,20 @@ const toggleDropdown = () => (isOpen.value = !isOpen.value);
 </script>
 
 <template>
-	<div class="dropdown position-relative">
-		<div class="dropdown__label body-m">{{ label }}</div>
-		<div class="dropdown__header position-relative cursor-pointer border-xs" :class="{ 'dropdown__header--active': isOpen }" @click="toggleDropdown">
-			<span class="body-l">{{ contentOfSelectedItem }}</span>
-			<span class="dropdown__arrow position-absolute"><IconsArrow variant="down" /></span>
+	<div class="base-dropdown position-relative">
+		<div class="base-dropdown__label body-m">{{ label }}</div>
+		<div class="base-dropdown__header position-relative cursor-pointer border-xs" :class="{ 'base-dropdown__header--active': isOpen }" @click="toggleDropdown">
+			<span class="body-l base-dropdown__text">{{ contentOfSelectedItem }}</span>
+			<span class="base-dropdown__arrow position-absolute"><IconsArrow variant="down" /></span>
 		</div>
-		<Transition name="slidein" mode="out-in" :appear="true">
-			<ul v-if="isOpen" class="dropdown__body flex flex-column border-m">
-				<li v-for="option in options" :key="option.value" class="dropdown__item body-l cursor-pointer" @click="selectItem(option.value)">{{ option.content }}</li>
-			</ul>
-		</Transition>
+		<DropdownList :show="isOpen" width="100%" top="calc(100% + 1rem)" gap="0.8rem" @outside-clicked="isOpen = false">
+			<DropdownListItem v-for="option in options" :key="option.value" @click.stop="selectItem(option.value)"> {{ option.content }}</DropdownListItem>
+		</DropdownList>
 	</div>
 </template>
 
 <style lang="scss" scoped>
-.dropdown {
+.base-dropdown {
 	&__header {
 		border: 0.1rem solid rgba(130, 143, 163, 0.25);
 		padding: 0.8rem 1.6rem;
@@ -60,20 +58,6 @@ const toggleDropdown = () => (isOpen.value = !isOpen.value);
 		margin-bottom: 0.8rem;
 	}
 
-	&__body {
-		background: var(--white-background);
-		box-shadow: 0rem 1rem 2rem rgba(54, 78, 126, 0.25);
-		padding: 1.6rem;
-	}
-
-	&__body {
-		gap: 0.8rem;
-		margin-top: 0.7rem;
-	}
-
-	&__item {
-		color: var(--medium-grey-text);
-	}
 
 	&__arrow {
 		right: 1.6rem;

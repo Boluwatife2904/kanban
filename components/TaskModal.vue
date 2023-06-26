@@ -17,6 +17,7 @@ const props = defineProps<Props>();
 
 const showTaskModal = ref(props.show);
 const currentModalView = ref(props.view);
+const showTaskOptions = ref(false);
 const options = [
 	{ value: "Todo", content: "Todo" },
 	{ value: "Doing", content: "Doing" },
@@ -31,6 +32,13 @@ const closeModal = () => {
 		emits("close-modal");
 	}, 1);
 };
+
+const editTask = () => {
+	console.log("Is Editing Task");
+};
+const deleteTask = () => {
+	console.log("Id Deleting Task");
+};
 </script>
 
 <template>
@@ -38,8 +46,15 @@ const closeModal = () => {
 		<template #content>
 			<template v-if="currentModalView === 'view' && task">
 				<div class="single-task flex flex-column">
-					<div class="single-task__header">
+					<div class="single-task__header flex items-center content-space-between">
 						<h4 class="single-task__title heading-l primary-text">{{ task.title }}</h4>
+						<div class="single-task__options position-relative">
+							<DropdownToggler @click="showTaskOptions = !showTaskOptions" />
+							<DropdownList :show="showTaskOptions" width="19.2rem" top="4rem" left="-9rem" gap="1.6rem" @outside-clicked="showTaskOptions = false">
+								<DropdownListItem @click.stop="editTask">Edit Task</DropdownListItem>
+								<DropdownListItem :is-delete="true" @click.stop="deleteTask">Delete Task</DropdownListItem>
+							</DropdownList>
+						</div>
 					</div>
 					<p v-if="task.description" class="single-task__description body-l medium-grey-text">{{ task.description }}</p>
 					<div class="single-task__subtasks flex flex-column">
@@ -72,6 +87,10 @@ const closeModal = () => {
 		&__list {
 			gap: 0.8rem;
 		}
+	}
+
+	&__header {
+		gap: 2.4rem;
 	}
 }
 </style>

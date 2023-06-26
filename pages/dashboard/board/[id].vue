@@ -19,6 +19,7 @@ const selectedBoard = kanban.boards.find((board) => board.name === boardsMap[rou
 const selectedTask = ref<Task | null>(null);
 const showTaskModal = ref(false);
 const taskModalView = ref("");
+const showBoardOptions = ref(false);
 
 const openTaskModal = (showModal: boolean, viewType: string) => {
 	showTaskModal.value = showModal;
@@ -35,6 +36,14 @@ const showSingleTask = (columnName: string, taskTitle: string) => {
 		}
 	}
 };
+
+const editBoard = () => {
+	console.log("Is Editing Board");
+};
+
+const deleteBoard = () => {
+	console.log("Is Deleting Board");
+};
 </script>
 
 <template>
@@ -50,7 +59,13 @@ const showSingleTask = (columnName: string, taskTitle: string) => {
 					<span class="hide-on-mobile">+ &nbsp; Add new task</span>
 					<span class="hide-on-desktop"><IconsPlus /></span>
 				</BaseButton>
-				<button><IconsEllipsis /></button>
+				<div class="single-task__options position-relative">
+					<DropdownToggler @click="showBoardOptions = !showBoardOptions" />
+					<DropdownList :show="showBoardOptions" width="19.2rem" top="calc(100% + 2.2rem)" right="0rem" gap="1.6rem" @outside-clicked="showBoardOptions = false">
+						<DropdownListItem @click.stop="editBoard">Edit Board</DropdownListItem>
+						<DropdownListItem :is-delete="true" @click.stop="deleteBoard">Delete Board</DropdownListItem>
+					</DropdownList>
+				</div>
 			</div>
 		</div>
 		<div class="single-board__body" :class="{ 'flex items-center content-center': selectedBoard?.columns.length === 0 }">
@@ -103,14 +118,14 @@ const showSingleTask = (columnName: string, taskTitle: string) => {
 
 	&__content {
 		gap: 2.4rem;
-        overflow-y: scroll;
+		overflow-y: scroll;
 	}
 
 	&__column {
 		flex: 1 1 28rem;
 		width: 100%;
 		max-width: 28rem;
-        flex-shrink: 0;
+		flex-shrink: 0;
 
 		&__name {
 			margin-bottom: 2.4rem;

@@ -27,10 +27,16 @@ const numberOfCompletedTasks = computed(() => props.task.subtasks.filter((task) 
 	border-radius: 0.8rem;
 	background: var(--sidebar-background);
 	box-shadow: 0rem 0.4rem 6px 0px rgba(54, 78, 126, 0.1);
-	color: var(--primary-text);
 	padding: 2.3rem 1.6rem;
 	gap: 0.8rem;
 	cursor: pointer;
 
+	&__title {
+		color: var(--primary-text);
+
+		&:hover {
+			color: var(--primary-color);
+		}
+	}
 }
 </style>

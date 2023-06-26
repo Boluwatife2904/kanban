@@ -10,4 +10,8 @@
 	</svg>
 </template>
 
-<style scoped></style>
+<style scoped>
+svg {
+    pointer-events: none;
+}
+</style>
