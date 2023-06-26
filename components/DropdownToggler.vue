@@ -7,7 +7,7 @@
 </script>
 
 <template>
-	<button class="dropdown__toggler">
+	<button type="button" class="dropdown__toggler">
 		<IconsEllipsis />
 	</button>
 </template>

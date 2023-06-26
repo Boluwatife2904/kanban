@@ -81,7 +81,8 @@ const deleteBoard = () => {
 		</div>
 	</div>
 
-	<TaskModal v-if="showTaskModal" :show="showTaskModal" :task="selectedTask" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
+	<TaskViewModal v-if="showTaskModal" :show="taskModalView === 'view'" :task="selectedTask" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
+	<TaskCreateUpdateModal v-if="showTaskModal" :show="taskModalView === 'add' || taskModalView === 'edit'" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
 </template>
 
 <style lang="scss" scoped>

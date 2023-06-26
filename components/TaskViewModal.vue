@@ -16,7 +16,6 @@ const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 
 const showTaskModal = ref(props.show);
-const currentModalView = ref(props.view);
 const showTaskOptions = ref(false);
 const options = [
 	{ value: "Todo", content: "Todo" },
@@ -44,7 +43,7 @@ const deleteTask = () => {
 <template>
 	<BaseModal :show="showTaskModal" @close-modal="closeModal">
 		<template #content>
-			<template v-if="currentModalView === 'view' && task">
+			<template v-if="task">
 				<div class="single-task flex flex-column">
 					<div class="single-task__header flex items-center content-space-between">
 						<h4 class="single-task__title heading-l primary-text">{{ task.title }}</h4>
@@ -67,9 +66,6 @@ const deleteTask = () => {
 						<BaseDropdown :options="options" v-model="task.status" label="Current Status" />
 					</div>
 				</div>
-			</template>
-			<template v-else-if="currentModalView === 'edit' || currentModalView === 'add'">
-				{{ view }}
 			</template>
 		</template>
 	</BaseModal>

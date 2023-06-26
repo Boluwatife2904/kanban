@@ -7,7 +7,7 @@ const { isDelete = false } = defineProps<Props>();
 </script>
 
 <template>
-	<button class="dropdown__list-item body-l" :class="isDelete ? 'destructive-text' : 'medium-grey-text'">
+	<button type="button" class="dropdown__list-item body-l text-left" :class="isDelete ? 'destructive-text' : 'medium-grey-text'">
 		<slot></slot>
 	</button>
 </template>

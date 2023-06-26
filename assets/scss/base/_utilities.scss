@@ -40,7 +40,7 @@ $content-justification: center, space-between;
 	}
 }
 
-$text-alignments: center, justify;
+$text-alignments: center, justify, left;
 @each $alignment in $text-alignments {
 	.text-#{$alignment} {
 		text-align: $alignment;
