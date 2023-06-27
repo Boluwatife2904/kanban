@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import kanban from "@/data/kanban.json";
-import type { Task } from "@/types";
+import type { Task, ItemToDelete } from "@/types";
 
 definePageMeta({
 	layout: "dashboard",
@@ -20,6 +20,12 @@ const selectedTask = ref<Task | null>(null);
 const showTaskModal = ref(false);
 const taskModalView = ref("");
 const showBoardOptions = ref(false);
+const showDeleteModal = ref(false);
+const itemToDelete = reactive({
+	id: "",
+	type: "",
+	name: "",
+});
 
 const openTaskModal = (showModal: boolean, viewType: string) => {
 	showTaskModal.value = showModal;
@@ -41,17 +47,21 @@ const editBoard = () => {
 	console.log("Is Editing Board");
 };
 
-const deleteBoard = () => {
-	console.log("Is Deleting Board");
+const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
+	if (type === "task") showTaskModal.value = false;
+	showDeleteModal.value = true;
+	itemToDelete.id = id;
+	itemToDelete.type = type;
+	itemToDelete.name = name;
 };
 </script>
 
 <template>
-	<div class="single-board">
+	<div v-if="selectedBoard" class="single-board">
 		<div class="single-board__header flex items-center content-space-between">
 			<div class="single-board__header--left">
 				<p class="single-board__header__title heading-xl primary-text">
-					{{ selectedBoard?.name }}
+					{{ selectedBoard.name }}
 				</p>
 			</div>
 			<div class="single-board__header--right flex items-center">
@@ -63,7 +73,7 @@ const deleteBoard = () => {
 					<DropdownToggler @click="showBoardOptions = !showBoardOptions" />
 					<DropdownList :show="showBoardOptions" width="19.2rem" top="calc(100% + 2.2rem)" right="0rem" gap="1.6rem" @outside-clicked="showBoardOptions = false">
 						<DropdownListItem @click.stop="editBoard">Edit Board</DropdownListItem>
-						<DropdownListItem :is-delete="true" @click.stop="deleteBoard">Delete Board</DropdownListItem>
+						<DropdownListItem :is-delete="true" @click.stop="deleteBoardOrTask({ id: '1', name: selectedBoard.name, type: 'board' })">Delete Board</DropdownListItem>
 					</DropdownList>
 				</div>
 			</div>
@@ -81,8 +91,9 @@ const deleteBoard = () => {
 		</div>
 	</div>
 
-	<TaskViewModal v-if="showTaskModal" :show="taskModalView === 'view'" :task="selectedTask" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
+	<TaskViewModal v-if="showTaskModal" :show="taskModalView === 'view'" :task="selectedTask" :view="taskModalView" @close-modal="openTaskModal(false, '')" @delete-task="deleteBoardOrTask" />
 	<TaskCreateUpdateModal v-if="showTaskModal" :show="taskModalView === 'add' || taskModalView === 'edit'" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
+	<TheActionPrompt :show="showDeleteModal" :item-to-delete="itemToDelete" @cancel-action="showDeleteModal = false" />
 </template>
 
 <style lang="scss" scoped>

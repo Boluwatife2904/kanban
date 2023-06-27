@@ -17,3 +17,9 @@ export interface Board {
 		tasks: Task[];
 	};
 }
+
+export interface ItemToDelete {
+    id: string;
+    name: string;
+    type: string;
+}

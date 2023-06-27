@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Task } from "@/types";
+import type { Task, ItemToDelete } from "@/types";
 
 interface Props {
 	show: boolean;
@@ -9,6 +9,7 @@ interface Props {
 
 interface Emits {
 	(event: "close-modal"): void;
+	(event: "delete-task", item: ItemToDelete): void;
 }
 
 const emits = defineEmits<Emits>();
@@ -36,7 +37,7 @@ const editTask = () => {
 	console.log("Is Editing Task");
 };
 const deleteTask = () => {
-	console.log("Id Deleting Task");
+	emits("delete-task", { name: props.task!.title, id: "1", type: "task" });
 };
 </script>
 
