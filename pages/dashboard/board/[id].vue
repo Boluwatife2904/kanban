@@ -17,19 +17,19 @@ const boardsMap: { [key: string]: string } = {
 
 const selectedBoard = kanban.boards.find((board) => board.name === boardsMap[routeId]);
 const selectedTask = ref<Task | null>(null);
-const showTaskModal = ref(false);
-const taskModalView = ref("");
 const showBoardOptions = ref(false);
-const showDeleteModal = ref(false);
-const itemToDelete = reactive({
+const itemToDelete = reactive<ItemToDelete>({
 	id: "",
 	type: "",
 	name: "",
 });
 
-const openTaskModal = (showModal: boolean, viewType: string) => {
-	showTaskModal.value = showModal;
-	taskModalView.value = viewType;
+const activeModal = ref("");
+const activeModalType = ref("");
+
+const setActiveModal = (modalType: string, itemType: string) => {
+	activeModal.value = modalType;
+	activeModalType.value = itemType;
 };
 
 const showSingleTask = (columnName: string, taskTitle: string) => {
@@ -38,7 +38,7 @@ const showSingleTask = (columnName: string, taskTitle: string) => {
 		const task = selectedColumn.tasks.find((task) => task.title === taskTitle);
 		if (task) {
 			selectedTask.value = task;
-			openTaskModal(true, "view");
+			setActiveModal("view", "task");
 		}
 	}
 };
@@ -48,11 +48,10 @@ const editBoard = () => {
 };
 
 const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
-	if (type === "task") showTaskModal.value = false;
-	showDeleteModal.value = true;
 	itemToDelete.id = id;
 	itemToDelete.type = type;
 	itemToDelete.name = name;
+	setActiveModal("delete", type);
 };
 </script>
 
@@ -65,7 +64,7 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 				</p>
 			</div>
 			<div class="single-board__header--right flex items-center">
-				<BaseButton class="single-board__header__button" size="large" @click="openTaskModal(true, 'add')">
+				<BaseButton class="single-board__header__button" size="large" @click="setActiveModal('add', 'task')">
 					<span class="hide-on-mobile">+ &nbsp; Add new task</span>
 					<span class="hide-on-desktop"><IconsPlus /></span>
 				</BaseButton>
@@ -91,9 +90,9 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 		</div>
 	</div>
 
-	<TaskViewModal v-if="showTaskModal" :show="taskModalView === 'view'" :task="selectedTask" :view="taskModalView" @close-modal="openTaskModal(false, '')" @delete-task="deleteBoardOrTask" />
-	<TaskCreateUpdateModal v-if="showTaskModal" :show="taskModalView === 'add' || taskModalView === 'edit'" :view="taskModalView" @close-modal="openTaskModal(false, '')" />
-	<TheActionPrompt :show="showDeleteModal" :item-to-delete="itemToDelete" @cancel-action="showDeleteModal = false" />
+	<TaskViewModal v-if="activeModal === 'view'" :show="activeModal === 'view'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" @edit-task="setActiveModal('edit', 'task')" @close-modal="setActiveModal('', '')" />
+	<TaskCreateUpdateModal v-if="activeModal === 'add' || activeModal === 'edit'" :show="activeModal === 'add' || activeModal === 'edit'" :view="activeModal" :task="selectedTask" @close-modal="setActiveModal('', '')" />
+	<TheActionPrompt :show="activeModal === 'delete'" :item-to-delete="itemToDelete" @cancel-action="setActiveModal('', '')" />
 </template>
 
 <style lang="scss" scoped>

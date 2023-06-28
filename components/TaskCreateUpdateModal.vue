@@ -11,53 +11,50 @@ interface Emits {
 	(event: "close-modal"): void;
 }
 
-const emits = defineEmits<Emits>();
+defineEmits<Emits>();
 const props = defineProps<Props>();
 
-const showTaskModal = ref(props.show);
 const options = [
 	{ value: "Todo", content: "Todo" },
 	{ value: "Doing", content: "Doing" },
 	{ value: "Progress", content: "Progress" },
 	{ value: "Done", content: "Done" },
 ];
-const subtasks = ref([
-	{ id: 1, title: "", isCompleted: false },
-	{ id: 2, title: "", isCompleted: false },
-]);
-const newTask = reactive({
+
+const newTask: Task = reactive({
 	title: "",
 	description: "",
 	status: "",
 	subtasks: [
-		{ id: 1, title: "", isCompleted: false },
-		{ id: 2, title: "", isCompleted: false },
+		{ title: "", isCompleted: false },
+		{ title: "", isCompleted: false },
 	],
 });
 
-const closeModal = () => {
-	showTaskModal.value = false;
-	setTimeout(() => {
-		emits("close-modal");
-	}, 1);
-};
+if (props.view === "edit" && props.task) {
+	newTask.title = props.task.title;
+	newTask.description = props.task.description;
+	newTask.status = props.task.status;
+	newTask.subtasks = props.task.subtasks;
+	console.log(props.task);
+}
 
 const createOrUpdateTask = () => {};
 
 const addNewSubtask = () => {
-	newTask.subtasks.push({ id: newTask.subtasks.length + 1, title: "", isCompleted: false });
+	newTask.subtasks.push({ title: "", isCompleted: false });
 };
 
-const removeSubtask = (taskId: number) => {
-	newTask.subtasks = newTask.subtasks.filter((subtask) => subtask.id !== taskId);
+const removeSubtask = (taskTitle: string) => {
+	newTask.subtasks = newTask.subtasks.filter((subtask) => subtask.title !== taskTitle);
 };
 </script>
 
 <template>
-	<BaseModal :show="showTaskModal" @close-modal="closeModal">
+	<LazyBaseModal :show="show" @close-modal="$emit('close-modal')">
 		<template #content>
 			<div class="task-form">
-				<h5 class="task-form__title heading-l primary-text">Add New Task</h5>
+				<h5 class="task-form__title heading-l primary-text">{{ view === "add" ? "Add New" : "Edit" }} Task</h5>
 				<form class="task-form__form flex flex-column" @submit.prevent="createOrUpdateTask">
 					<BaseInput v-model="newTask.title" label="Title" placeholder="e.g. Take coffee break" />
 					<BaseTextarea
@@ -68,9 +65,9 @@ recharge the batteries a little."
 					/>
 					<BaseInputWrapper label="Subtasks">
 						<div class="task-form__subtasks flex flex-column">
-							<div v-for="(subtask, index) in newTask.subtasks" :key="subtask.id" class="task-form__subtask flex items-center">
+							<div v-for="(subtask, index) in newTask.subtasks" :key="subtask.title" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
-								<button @click="removeSubtask(subtask.id)"><IconsClose /></button>
+								<button @click="removeSubtask(subtask.title)"><IconsClose /></button>
 							</div>
 							<BaseButton type="button" variant="secondary" @click="addNewSubtask">+ Add New Subtask</BaseButton>
 						</div>
@@ -80,7 +77,7 @@ recharge the batteries a little."
 				</form>
 			</div>
 		</template>
-	</BaseModal>
+	</LazyBaseModal>
 </template>
 
 <style lang="scss" scoped>
@@ -100,13 +97,13 @@ recharge the batteries a little."
 	&__subtask {
 		gap: 1.6rem;
 
-        button {
-            color: var(--medium-grey-text);
+		button {
+			color: var(--medium-grey-text);
 
-            &:hover {
-                color: var(--destructive-color);
-            }
-        }
+			&:hover {
+				color: var(--destructive-color);
+			}
+		}
 	}
 }
 </style>

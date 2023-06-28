@@ -58,13 +58,13 @@ const closeModal = () => {
 	left: 0;
 	background: rgb(0, 0, 0, 0.5);
 	height: 100vh;
-	padding: 0 1.6rem;
+	padding: 5rem 1.6rem;
 	z-index: 10;
 	overflow-y: auto;
 
 	&__wrapper {
 		margin: auto;
-		padding: 3rem 0;
+		padding: 0;
 		max-width: 48rem;
 	}
 
