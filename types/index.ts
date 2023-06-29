@@ -13,13 +13,22 @@ export interface Task {
 export interface Board {
 	name: string;
 	columns: {
-        name: string;
+		name: string;
 		tasks: Task[];
 	};
 }
 
+interface Column {
+    name: string
+}
+
+export interface BoardItem {
+	name: string;
+	columns: Column[];
+}
+
 export interface ItemToDelete {
-    id: string;
-    name: string;
-    type: string;
+	id: string;
+	name: string;
+	type: string;
 }

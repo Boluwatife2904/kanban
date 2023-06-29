@@ -1,10 +1,5 @@
 <script setup lang="ts">
 const modelValue = defineModel<boolean>();
-const boards = [
-	{ id: "1", title: "Platform Launch" },
-	{ id: "2", title: "Marketing Plan" },
-	{ id: "3", title: "Roadmap" },
-];
 </script>
 
 <template>

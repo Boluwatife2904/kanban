@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useEvent } from '@/composables/useEventBus';
+
 const boards = [
 	{ id: "1", title: "Platform Launch" },
 	{ id: "2", title: "Marketing Plan" },
@@ -17,7 +19,7 @@ const boards = [
 				</NuxtLink>
 			</li>
 		</ul>
-		<button class="boards__item boards__item--add heading-m flex items-center">
+		<button class="boards__item boards__item--add heading-m flex items-center" @click="useEvent('add-board')">
 			<IconsBoard />
 			<span> +Create New Board </span>
 		</button>

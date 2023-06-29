@@ -31,7 +31,7 @@ const newTask: Task = reactive({
 	],
 });
 
-if (props.view === "edit" && props.task) {
+if (props.view === "edit-task" && props.task) {
 	newTask.title = props.task.title;
 	newTask.description = props.task.description;
 	newTask.status = props.task.status;
@@ -54,7 +54,7 @@ const removeSubtask = (taskTitle: string) => {
 	<LazyBaseModal :show="show" @close-modal="$emit('close-modal')">
 		<template #content>
 			<div class="task-form">
-				<h5 class="task-form__title heading-l primary-text">{{ view === "add" ? "Add New" : "Edit" }} Task</h5>
+				<h5 class="task-form__title heading-l primary-text">{{ view === "add-task" ? "Add New" : "Edit" }} Task</h5>
 				<form class="task-form__form flex flex-column" @submit.prevent="createOrUpdateTask">
 					<BaseInput v-model="newTask.title" label="Title" placeholder="e.g. Take coffee break" />
 					<BaseTextarea
@@ -65,7 +65,7 @@ recharge the batteries a little."
 					/>
 					<BaseInputWrapper label="Subtasks">
 						<div class="task-form__subtasks flex flex-column">
-							<div v-for="(subtask, index) in newTask.subtasks" :key="subtask.title" class="task-form__subtask flex items-center">
+							<div v-for="(subtask, index) in newTask.subtasks" :key="index" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
 								<button @click="removeSubtask(subtask.title)"><IconsClose /></button>
 							</div>
@@ -73,7 +73,7 @@ recharge the batteries a little."
 						</div>
 					</BaseInputWrapper>
 					<BaseDropdown v-model="newTask.status" label="Status" :options="options" />
-					<BaseButton>{{ view === "add" ? "Create Task" : "Save Changes" }}</BaseButton>
+					<BaseButton>{{ view === "add-task" ? "Create Task" : "Save Changes" }}</BaseButton>
 				</form>
 			</div>
 		</template>
