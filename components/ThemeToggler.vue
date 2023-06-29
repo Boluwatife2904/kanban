@@ -14,7 +14,7 @@ const { selectedTheme, toggleTheme } = useTheme();
 
 <style lang="scss" scoped>
 .theme-toggler {
-	max-width: 23.5rem;
+	max-width: 100%;
 	background-color: var(--light-grey-background);
 	gap: 2.4rem;
 	padding: 1.4rem;

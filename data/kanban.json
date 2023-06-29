@@ -425,6 +425,10 @@
 					"tasks": []
 				}
 			]
+		},
+        {
+			"name": "Cleanup",
+			"columns": []
 		}
 	]
 }

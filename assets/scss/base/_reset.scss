@@ -31,3 +31,7 @@ button {
 		cursor: not-allowed;
 	}
 }
+
+svg {
+    flex-shrink: 0;
+}

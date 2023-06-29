@@ -1,20 +1,21 @@
 <script setup lang="ts">
 interface ModalProps {
 	show: boolean;
+	hasPadding?: boolean;
 }
 
 interface ModalEmits {
 	(event: "close-modal"): void;
 }
 
-const props = defineProps<ModalProps>();
+const { hasPadding = true, show = false } = defineProps<ModalProps>();
 const emits = defineEmits<ModalEmits>();
 
 const showModalContent = ref(false);
 
 onMounted(() => {
 	watchEffect(() => {
-		if (props.show) {
+		if (show) {
 			showModalContent.value = true;
 			document.body.classList.add("overflow-hidden");
 		} else {
@@ -37,7 +38,7 @@ const closeModal = () => {
 			<div v-if="show" class="modal position-fixed w-100 flex items-center content-center" @click.self="closeModal">
 				<div class="modal__wrapper flex flex-column w-100 items-center content-center">
 					<Transition name="slidein" mode="out-in" :appear="true">
-						<div v-if="showModalContent" class="modal__body flex flex-column w-100 border-s">
+						<div v-if="showModalContent" class="modal__body flex flex-column w-100 border-s" :class="{ 'modal__body--padded': hasPadding }">
 							<div class="modal__header">
 								<slot name="header" />
 							</div>
@@ -70,8 +71,11 @@ const closeModal = () => {
 
 	&__body {
 		margin: 0;
-		padding: 3.2rem;
 		background-color: var(--body-background);
+
+		&--padded {
+			padding: 3.2rem;
+		}
 	}
 
 	&__header {

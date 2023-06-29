@@ -1,8 +1,8 @@
-// composables/useEventBus.ts
 import mitt from "mitt";
 
 type ApplicationEvents = {
 	"add-board": undefined;
+	"show-sidebar": undefined;
 };
 
 const emitter = mitt<ApplicationEvents>();

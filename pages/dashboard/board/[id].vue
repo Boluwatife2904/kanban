@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import kanban from "@/data/kanban.json";
 import type { Task, ItemToDelete } from "@/types";
-import { useListen } from "@/composables/useEventBus";
+import { useListen, useEvent } from "@/composables/useEventBus";
 
 definePageMeta({
 	layout: "dashboard",
@@ -14,6 +14,7 @@ const boardsMap: { [key: string]: string } = {
 	"1": "Platform Launch",
 	"2": "Marketing Plan",
 	"3": "Roadmap",
+	"4": "Cleanup",
 };
 
 const selectedBoard = kanban.boards.find((board) => board.name === boardsMap[routeId]);
@@ -49,16 +50,18 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 };
 
 useListen("add-board", () => {
-	activeModal.value = "add-board";
+	setActiveModal("add-board");
 });
 </script>
 
 <template>
 	<div v-if="selectedBoard" class="single-board">
 		<div class="single-board__header flex items-center content-space-between">
-			<div class="single-board__header--left">
-				<p class="single-board__header__title heading-xl primary-text">
-					{{ selectedBoard.name }}
+			<div class="single-board__header--left flex items-center">
+				<TheLogo variant="mobile" />
+				<p class="single-board__header__title heading-xl primary-text flex items-center" @click="useEvent('show-sidebar')">
+					<span>{{ selectedBoard.name }}</span>
+					<IconsArrow variant="down" />
 				</p>
 			</div>
 			<div class="single-board__header--right flex items-center">
@@ -78,13 +81,17 @@ useListen("add-board", () => {
 		<div class="single-board__body" :class="{ 'flex items-center content-center': selectedBoard?.columns.length === 0 }">
 			<div v-if="selectedBoard && selectedBoard.columns.length > 0" class="single-board__content flex">
 				<section class="single-board__column" v-for="column in selectedBoard.columns" :key="column.name">
-					<h6 class="medium-grey-text heading-s text-uppercase single-board__column__name">{{ column.name }} ({{ column.tasks.length }})</h6>
+					<h6 class="medium-grey-text heading-s text-uppercase single-board__column__name flex items-center">
+						<span class="single-board__column__color block border-rounded"></span>
+						{{ column.name }} ({{ column.tasks.length }})
+					</h6>
 					<div class="single-board__tasks flex flex-column">
 						<DashboardBoardCard v-for="task in column.tasks" :key="task.title" :task="task" @show-task="showSingleTask(column.name, task.title)" />
 					</div>
 				</section>
+				<button class="single-board__column single-board__column--add medium-grey-text heading-xl border-s" @click="setActiveModal('edit-board')">+ New Column</button>
 			</div>
-			<LazyTheEmptyState v-else />
+			<LazyTheEmptyState v-else @add-column="setActiveModal('edit-board')" />
 		</div>
 	</div>
 
@@ -103,12 +110,40 @@ useListen("add-board", () => {
 		position: sticky;
 		top: 0;
 		left: 0;
+		gap: 2rem;
+
+		&--left {
+			gap: 1.8rem;
+
+			svg {
+				@media screen and (min-width: 768px) {
+					display: none;
+				}
+			}
+		}
 
 		&--right {
 			gap: 1.6rem;
 
 			@media screen and (min-width: 768px) {
 				gap: 2.4rem;
+			}
+		}
+
+		&__title {
+			cursor: pointer;
+			gap: 0.8rem;
+
+			span {
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			@media screen and (min-width: 768px) {
+				cursor: default;
+				pointer-events: none;
 			}
 		}
 
@@ -123,12 +158,12 @@ useListen("add-board", () => {
 
 	&__body {
 		min-height: calc(100vh - 10rem);
-		padding: 2.4rem 0 5rem 2.4rem;
+		overflow-y: scroll;
 	}
 
 	&__content {
 		gap: 2.4rem;
-		overflow-y: scroll;
+		padding: 2.4rem 0 5rem 2.4rem;
 	}
 
 	&__column {
@@ -137,8 +172,38 @@ useListen("add-board", () => {
 		max-width: 28rem;
 		flex-shrink: 0;
 
+		&:nth-child(1) {
+			.single-board__column__color {
+				background-color: #49c4e5;
+			}
+		}
+
+		&:nth-child(2) {
+			.single-board__column__color {
+				background-color: #8471f2;
+			}
+		}
+
+		&:nth-child(3) {
+			.single-board__column__color {
+				background-color: #67e2ae;
+			}
+		}
+
+		&__color {
+			height: 1.5rem;
+			width: 1.5rem;
+		}
+
 		&__name {
 			margin-bottom: 2.4rem;
+			gap: 1.2rem;
+		}
+
+		&--add {
+			min-height: calc(100vh - 10rem);
+			margin-top: 3.9rem;
+			background: var(--add-column-background);
 		}
 	}
 

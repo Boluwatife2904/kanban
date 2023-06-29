@@ -1,5 +1,21 @@
 <script setup lang="ts">
+import { useListen } from "@/composables/useEventBus";
+
 const sidebarIsHidden = ref(false);
+
+const route = useRoute();
+const showMobileSidebar = ref(false);
+
+watch(
+	() => route.fullPath,
+	() => {
+		showMobileSidebar.value = false;
+	}
+);
+
+useListen("show-sidebar", () => {
+	showMobileSidebar.value = !showMobileSidebar.value;
+});
 </script>
 
 <template>
@@ -14,13 +30,24 @@ const sidebarIsHidden = ref(false);
 		<button v-if="sidebarIsHidden" class="sidebar__toggler--mobile position-fixed" @click="sidebarIsHidden = !sidebarIsHidden">
 			<IconsEye />
 		</button>
+
+		<BaseModal :show="showMobileSidebar" :has-padding="false" :is-centered="false" @close-modal="showMobileSidebar = false">
+			<template #content>
+				<div class="sidebar--mobile">
+					<DashboardBoards />
+					<div class="sidebar--mobile__theme">
+						<ThemeToggler />
+					</div>
+				</div>
+			</template>
+		</BaseModal>
 	</div>
 </template>
 
 <style lang="scss" scoped>
 .dashboard {
 	height: 100vh;
-    overflow-y: hidden;
+	overflow-y: hidden;
 
 	@media screen and (min-width: 768px) {
 		grid-template-columns: 26.1rem auto;
@@ -49,7 +76,7 @@ const sidebarIsHidden = ref(false);
 		width: 100%;
 		min-height: 100vh;
 		background-color: var(--light-grey-background);
-        overflow-y: scroll;
+		overflow-y: scroll;
 	}
 }
 
@@ -68,6 +95,14 @@ const sidebarIsHidden = ref(false);
 
 	&:hover {
 		background-color: var(--primary-color-hover);
+	}
+}
+
+.sidebar--mobile {
+	padding-top: 1.6rem;
+
+	&__theme {
+		padding: 1.6rem;
 	}
 }
 </style>
