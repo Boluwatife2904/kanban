@@ -19,4 +19,5 @@ export default defineNuxtConfig({
 		},
 	},
 	css: ["@/assets/scss/index.scss", "@/assets/scss/fonts.scss"],
+	modules: ["@nuxtjs/supabase"],
 });

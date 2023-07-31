@@ -2,14 +2,16 @@
 interface ButtonProps {
 	variant?: string;
 	size?: string;
+	radius?: string;
 }
 
-const { variant = "primary", size = "large" } = defineProps<ButtonProps>();
+const { variant = "primary", size = "large", radius = "default" } = defineProps<ButtonProps>();
 
 const buttonClasses = computed(() => {
-	return ["variant", "size"].map((item) => {
+	return ["variant", "size", "radius"].map((item) => {
 		if (item === "variant") return `button--${variant}`;
 		else if (item === "size") return `button--${size}`;
+		else if (item === "radius") return `button--radius-${radius}`;
 	});
 });
 </script>
@@ -59,6 +61,10 @@ const buttonClasses = computed(() => {
 		border-radius: 2rem;
 		padding: 0.8rem;
 		@include typeface(700, 1.3rem, 2.3rem);
+	}
+
+	&--radius-small {
+		border-radius: 0.4rem;
 	}
 }
 </style>

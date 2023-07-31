@@ -94,6 +94,10 @@ $text-transformations: capitalize, uppercase;
 	color: var(--destructive-color);
 }
 
+.primary-color-text {
+	color: var(--primary-color);
+}
+
 .hide-on-desktop {
 	display: block;
 

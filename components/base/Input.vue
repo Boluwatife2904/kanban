@@ -19,7 +19,7 @@ const checkInputValidity = () => {
 
 <template>
 	<div class="input w-100 position-relative">
-		<label v-if="label" :for="id" class="input__label body-m block">{{ label }}</label>
+		<label v-if="label" :for="id" class="input__label body-m flex items-center content-space-between">{{ label }} <slot name="label" /></label>
 		<input v-model="modelValue" :type="type" :name="name" :id="id" :placeholder="placeholder" class="input__element body-l block w-100 border-xs primary-text" :class="{ 'input__element--invalid': isInvalid }" @focus="isInvalid = false" @blur="checkInputValidity" />
 		<span v-if="isInvalid" class="body-l position-absolute input__error destructive-text">Can't be empty</span>
 	</div>

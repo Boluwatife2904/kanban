@@ -10,9 +10,10 @@
 	},
 	"devDependencies": {
 		"@nuxt/devtools": "latest",
+		"@nuxtjs/supabase": "^0.3.8",
 		"@types/node": "^18",
 		"mitt": "^3.0.0",
-		"nuxt": "^3.6.1",
+		"nuxt": "^3.6.5",
 		"sass": "^1.63.4"
 	}
 }

@@ -1,17 +1,18 @@
 <script setup lang="ts">
 interface CheckboxProps {
-    id: string;
+	id: string;
 	label?: string;
-    name: string;
+	name: string;
+	hasBackground?: boolean;
 }
 
-defineProps<CheckboxProps>();
+const { hasBackground = true } = defineProps<CheckboxProps>();
 
 const modelValue = defineModel<boolean>();
 </script>
 
 <template>
-	<label :for="id" class="checkbox border-xs w-100 inline-flex items-center">
+	<label :for="id" class="checkbox border-xs w-100 inline-flex items-center" :class="[{ 'checkbox--background': hasBackground }]">
 		<input :id="id" type="checkbox" v-model="modelValue" :checked="modelValue" />
 		<div class="box bg-white flex content-center items-center"></div>
 		<span class="body-m checkbox__label" :class="{ 'checkbox__label--checked': modelValue }"> {{ label }} </span>
@@ -20,12 +21,15 @@ const modelValue = defineModel<boolean>();
 
 <style lang="scss" scoped>
 .checkbox {
-	padding: 1.2rem;
 	cursor: pointer;
-	background-color: var(--light-grey-background);
 
-	&:hover {
-		background-color: rgb(99, 95, 199, 0.25);
+	&--background {
+		padding: 1.2rem;
+		background-color: var(--light-grey-background);
+
+		&:hover {
+			background-color: rgb(99, 95, 199, 0.25);
+		}
 	}
 
 	input {
@@ -68,7 +72,7 @@ const modelValue = defineModel<boolean>();
 		&--checked {
 			mix-blend-mode: normal;
 			opacity: 0.5;
-            text-decoration: line-through;
+			text-decoration: line-through;
 		}
 	}
 }
