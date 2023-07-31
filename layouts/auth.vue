@@ -4,7 +4,7 @@ const { selectedTheme } = useTheme();
 
 <template>
 	<div class="auth-layout">
-		<div class="auth-layout--left">
+		<div class="auth-layout--left flex items-center content-center">
 			<div class="auth-layout--left__content">
 				<slot />
 			</div>
@@ -41,6 +41,7 @@ const { selectedTheme } = useTheme();
 		}
 
 		&__content {
+            width: 100%;
 			max-width: 56rem;
             margin: 0 auto;
 		}

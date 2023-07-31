@@ -5,5 +5,5 @@ definePageMeta({
 </script>
 
 <template>
-	<AuthenticationForm mode="login" />
+	<AuthenticationForm mode="signup" />
 </template>
