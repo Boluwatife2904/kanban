@@ -13,7 +13,7 @@ const { selectedTheme } = useTheme();
 			<div class="auth-layout--right__content">
 				<div class="auth-layout__quote flex flex-column">
 					<h3 class="heading-xl primary-text">"When the going gets tough, the tough gets going"</h3>
-					<p class="body-l primary-text">- Joseph Kennedy - {{ selectedTheme }}</p>
+					<p class="body-l primary-text">- Joseph Kennedy</p>
 				</div>
 				<div class="auth-layout__images">
                     <img :src="selectedTheme === 'light-mode' ? '/images/demo-light.png' : '/images/demo-dark.png'" alt="Kanban demo" />
