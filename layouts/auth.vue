@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { selectedTheme } = useTheme();
-console.log(selectedTheme.value);
 </script>
 
 <template>
@@ -17,7 +16,7 @@ console.log(selectedTheme.value);
 					<p class="body-l primary-text">- Joseph Kennedy - {{ selectedTheme }}</p>
 				</div>
 				<div class="auth-layout__images">
-					<img :src="selectedTheme === 'light-mode' ? '/images/demo-light.png' : '/images/demo-dark.png'" alt="Kanban demo" />
+                    <img :src="selectedTheme === 'light-mode' ? '/images/demo-light.png' : '/images/demo-dark.png'" alt="Kanban demo" />
 				</div>
 			</div>
 		</div>

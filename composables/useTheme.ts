@@ -1,7 +1,7 @@
 import useStatefulCookie from "./useStatefulCookie";
 
 export function useTheme() {
-	const selectedTheme = useStatefulCookie("theme");
+	const selectedTheme = useStatefulCookie("theme", "light-mode");
 
 	const setTheme = (theme: string) => {
 		if (theme === "dark-mode") {
