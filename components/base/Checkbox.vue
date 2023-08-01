@@ -15,7 +15,7 @@ const modelValue = defineModel<boolean>();
 	<label :for="id" class="checkbox border-xs w-100 inline-flex items-center" :class="[{ 'checkbox--background': hasBackground }]">
 		<input :id="id" type="checkbox" v-model="modelValue" :checked="modelValue" />
 		<div class="box bg-white flex content-center items-center"></div>
-		<span class="body-m checkbox__label" :class="{ 'checkbox__label--checked': modelValue }"> {{ label }} </span>
+		<span class="body-m checkbox__label" :class="{ 'checkbox__label--checked': modelValue && hasBackground }"> {{ label }} </span>
 	</label>
 </template>
 
