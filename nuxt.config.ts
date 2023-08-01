@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 			},
 			title: "Kanban | Home",
 			charset: "UTF-8",
-			viewport: "width=device-width, initial-scale=1.0",
+			viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 			meta: [
 				{ hid: "description", name: "theme_color", content: "#635fc7" },
 				{ hid: "description", name: "description", content: "Flow your way to productivity: Your tasks, simplified with Kanban!" },
