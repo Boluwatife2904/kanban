@@ -3,6 +3,7 @@ const { selectedTheme } = useTheme();
 
 definePageMeta({
 	layout: "auth",
+	middleware: "guest",
 });
 
 const sendResetInstructions = () => {};
