@@ -2,9 +2,38 @@
 interface Props {
 	mode: "login" | "signup";
 }
+const authClient = useSupabaseAuthClient();
 const { mode = "login" } = defineProps<Props>();
 
-const loginOrSignup = () => {};
+const formData = reactive({
+	email: "",
+	password: "",
+	remember: true,
+});
+const isLoading = ref(false);
+
+const loginOrSignup = async () => {
+	isLoading.value = true;
+	if (mode === "login") {
+		const { error } = await authClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
+		if (error) {
+			useEvent("notify", { type: "error", message: error.message });
+		} else {
+			useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
+			navigateTo({ name: "dashboard" }, { replace: true });
+		}
+		isLoading.value = false;
+	} else if (mode === "signup") {
+		const { error } = await authClient.auth.signUp({ email: formData.email, password: formData.password });
+		if (error) {
+			useEvent("notify", { type: "error", message: error.message });
+		} else {
+			useEvent("notify", { type: "success", message: "Account created successfully. Have fun!" });
+			navigateTo({ name: "dashboard" }, { replace: true });
+		}
+		isLoading.value = false;
+	}
+};
 const loginWithGoogle = () => {};
 const gotoForgotPassword = () => navigateTo({ name: "forgot-password" });
 const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : navigateTo({ name: "index" }));
@@ -30,12 +59,12 @@ const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : 
 		<span class="or-text body-l">or</span>
 		<div class="authentication-form__body">
 			<form class="authentication-form__form flex flex-column" @submit.prevent="loginOrSignup">
-				<BaseInput id="email" label="Email Address" placeholder="name@company.com" />
-				<BaseInput id="password" label="Password" placeholder="name12345">
+				<BaseInput v-model="formData.email" id="email" label="Email Address" placeholder="name@company.com" />
+				<BaseInput v-model="formData.password" id="password" label="Password" placeholder="name12345" type="password">
 					<template v-if="mode === 'login'" #label><span class="primary-color-text cursor-pointer" @click="gotoForgotPassword">Forgot password?</span></template>
 				</BaseInput>
-				<BaseCheckbox v-if="mode === 'login'" id="remember" name="remember" label="Remember information" :has-background="false" />
-				<BaseButton radius="small">{{ mode === "login" ? "Log in" : "Sign up" }}</BaseButton>
+				<BaseCheckbox v-if="mode === 'login'" v-model="formData.remember" id="remember" name="remember" label="Remember information" :has-background="false" />
+				<BaseButton radius="small" :is-loading="isLoading">{{ mode === "login" ? "Log in" : "Sign up" }}</BaseButton>
 			</form>
 		</div>
 		<div class="authentication-form__footer">

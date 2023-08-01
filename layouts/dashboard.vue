@@ -31,7 +31,7 @@ useListen("show-sidebar", () => {
 			<IconsEye />
 		</button>
 
-		<BaseModal :show="showMobileSidebar" :has-padding="false" :is-centered="false" @close-modal="showMobileSidebar = false">
+		<BaseModal :show="showMobileSidebar" :has-padding="false" @close-modal="showMobileSidebar = false">
 			<template #content>
 				<div class="sidebar--mobile">
 					<DashboardBoards />

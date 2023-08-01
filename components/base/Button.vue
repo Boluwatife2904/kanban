@@ -3,9 +3,10 @@ interface ButtonProps {
 	variant?: string;
 	size?: string;
 	radius?: string;
+	isLoading?: boolean;
 }
 
-const { variant = "primary", size = "large", radius = "default" } = defineProps<ButtonProps>();
+const { variant = "primary", size = "large", radius = "default", isLoading = false } = defineProps<ButtonProps>();
 
 const buttonClasses = computed(() => {
 	return ["variant", "size", "radius"].map((item) => {
@@ -17,8 +18,9 @@ const buttonClasses = computed(() => {
 </script>
 
 <template>
-	<button :class="buttonClasses">
-		<slot />
+	<button class="button" :class="buttonClasses" :disabled="isLoading">
+		<span v-if="isLoading" class="loader"></span>
+		<slot v-else />
 	</button>
 </template>
 
@@ -65,6 +67,29 @@ const buttonClasses = computed(() => {
 
 	&--radius-small {
 		border-radius: 0.4rem;
+	}
+
+	&:disabled {
+		opacity: 0.5 !important;
+	}
+}
+.loader {
+	width: 1.6rem;
+	height: 1.6rem;
+	border: 0.2rem dashed #fff;
+	border-radius: 50%;
+	display: inline-block;
+	position: relative;
+	box-sizing: border-box;
+	animation: rotation 1.2s linear infinite;
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
 	}
 }
 </style>
