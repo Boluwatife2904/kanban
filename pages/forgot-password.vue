@@ -1,12 +1,28 @@
 <script setup lang="ts">
-const { selectedTheme } = useTheme();
-
 definePageMeta({
 	layout: "auth",
 	middleware: "guest",
 });
 
-const sendResetInstructions = () => {};
+const { selectedTheme } = useTheme();
+const authClient = useSupabaseAuthClient();
+const email = ref("");
+const isLoading = ref(false);
+
+const sendResetInstructions = async () => {
+	const config = useRuntimeConfig();
+	const baseUrl = config.public.frontendBaseUrl;
+	isLoading.value = true;
+	const { error } = await authClient.auth.resetPasswordForEmail(email.value, { redirectTo: `${baseUrl}/change-password` });
+	if (error) {
+		isLoading.value = false;
+		useEvent("notify", { type: "error", message: error.message });
+		return;
+	}
+	useEvent("notify", { type: "success", message: "Password reset instructions have been sent to your email." });
+	isLoading.value = false;
+};
+
 const goBackToLogin = () => navigateTo({ name: "index" });
 </script>
 
@@ -18,8 +34,8 @@ const goBackToLogin = () => navigateTo({ name: "index" });
 		</div>
 		<div class="reset-form__body">
 			<form class="reset-form__form flex flex-column" @submit.prevent="sendResetInstructions">
-				<BaseInput id="email" label="Email Address" placeholder="Enter your email" />
-				<BaseButton radius="small">Reset password</BaseButton>
+				<BaseInput v-model="email" id="email" label="Email Address" placeholder="Enter your email" />
+				<BaseButton radius="small" :is-loading="isLoading">Reset password</BaseButton>
 				<span class="flex items-center cursor-pointer primary-text body-m back-button" @click="goBackToLogin">
 					<svg :width="14" :height="14" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path

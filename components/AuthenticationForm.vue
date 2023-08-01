@@ -15,7 +15,7 @@ const isLoading = ref(false);
 const loginOrSignup = async () => {
 	isLoading.value = true;
 	if (mode === "login") {
-		const { data, error } = await authClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
+		const { error } = await authClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
 		if (error) {
 			isLoading.value = false;
 			useEvent("notify", { type: "error", message: error.message });
