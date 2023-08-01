@@ -23,7 +23,7 @@ interface Column {
 }
 
 export interface BoardItem {
-	name: string;
+	title: string;
 	columns: Column[];
 }
 

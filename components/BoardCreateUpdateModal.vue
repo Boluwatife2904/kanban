@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { v4 as uuidv4 } from "uuid";
 import type { BoardItem } from "@/types";
 
 interface Props {
@@ -6,36 +7,58 @@ interface Props {
 	view: string;
 	board?: BoardItem | null;
 }
-
 interface Emits {
 	(event: "close-modal"): void;
 }
-
-defineEmits<Emits>();
+const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 
-const newBoard: BoardItem = reactive({
-	name: "",
-	columns: [{ name: "" }, { name: "" }],
-});
+const client = useSupabaseClient();
+const user = useSupabaseUser();
+const authClient = useSupabaseAuthClient()
+
+const title = ref("");
+const columns = ref([
+	{ name: "", id: uuidv4() },
+	{ name: "", id: uuidv4() },
+]);
+const isLoading = ref(false);
 
 if (props.view === "edit-board" && props.board) {
-	newBoard.name = props.board.name;
+	newBoard.title = props.board.title;
 	newBoard.columns = props.board.columns.map(({ name }) => {
 		return { name };
 	});
 }
 
-const createOrUpdateBoard = () => {
+const createOrUpdateBoard = async () => {
+	if (props.view === "add-board") {
+		isLoading.value = true;
+		const boardData = { title: title.value, id: uuidv4(), user_id: user.value?.id };
+		const newColumns = columns.value.map(({ name, id }) => {
+			return { name, id, board_id: boardData.id, user_id: user.value?.id };
+		});
+		const { error: boardError } = await client.from("boards").insert(boardData);
+		const { error: columnsError } = await client.from("columns").insert(newColumns);
+		console.log(boardError, columnsError);
+		if (boardError || columnsError) {
+			isLoading.value = false;
+			useEvent("notify", { type: "error", message: "An error occurred trying to create the board. Please try again." });
+			return;
+		}
+		useEvent("notify", { type: "success", message: "New board created successfully." });
+		isLoading.value = false;
+		emits("close-modal");
+	}
 	console.log("Something something dey happen >>>>>>>>");
 };
 
 const addNewColumn = () => {
-	newBoard.columns.push({ name: "" });
+	columns.value.push({ name: "", id: uuidv4() });
 };
 
-const removeColumn = (columnTitle: string) => {
-	newBoard.columns = newBoard.columns.filter((column) => column.name !== columnTitle);
+const removeColumn = (columnId: string) => {
+	columns.value = columns.value.filter((column) => column.id !== columnId);
 };
 </script>
 
@@ -45,17 +68,17 @@ const removeColumn = (columnTitle: string) => {
 			<div class="board-form">
 				<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
 				<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
-					<BaseInput v-model="newBoard.name" label="Title" placeholder="e.g. Take coffee break" />
+					<BaseInput v-model="title" label="Title" placeholder="e.g. Take coffee break" />
 					<BaseInputWrapper label="Columns">
 						<div class="board-form__columns flex flex-column">
-							<div v-for="(item, index) in newBoard.columns" :key="index" class="board-form__column flex items-center">
+							<div v-for="(item, index) in columns" :key="item.id" class="board-form__column flex items-center">
 								<BaseInput v-model="item.name" type="text" :id="item.name" :placeholder="index % 2 === 0 ? 'e.g. Todo' : 'e.g. Doing'" />
-								<button type="button" @click="removeColumn(item.name)"><IconsClose /></button>
+								<button type="button" @click="removeColumn(item.id)"><IconsClose /></button>
 							</div>
 							<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 						</div>
 					</BaseInputWrapper>
-					<BaseButton>{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
+					<BaseButton :is-loading="isLoading">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
 				</form>
 			</div>
 		</template>

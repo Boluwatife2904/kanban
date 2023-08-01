@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useEvent } from '@/composables/useEventBus';
+import { useEvent } from "@/composables/useEventBus";
+import { useBoardStore } from "@/stores/board";
 
-const boards = [
-	{ id: "1", title: "Platform Launch" },
-	{ id: "2", title: "Marketing Plan" },
-	{ id: "3", title: "Roadmap" },
-];
+const { boards } = storeToRefs(useBoardStore());
 </script>
 
 <template>
@@ -35,6 +32,9 @@ const boards = [
 
 	&__list {
 		padding-right: 2.4rem;
+		height: 100%;
+		max-height: 21rem;
+		overflow-y: scroll;
 	}
 }
 </style>

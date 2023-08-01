@@ -1,13 +1,21 @@
 <script setup lang="ts">
 const modelValue = defineModel<boolean>();
+const authClient = useSupabaseAuthClient();
+
+const logout = () => {
+	authClient.auth.signOut().then(() => {
+		useEvent("notify", { type: "success", message: "You have been logged out successfully!" });
+		navigateTo({ name: "index" }, { replace: true });
+	});
+};
 </script>
 
 <template>
 	<aside class="sidebar flex flex-column">
-		<div class="sidebar__logo">
+		<div class="sidebar__logo cursor-pointer" @click="navigateTo({ name: 'dashboard' })">
 			<TheLogo />
 		</div>
-        <DashboardBoards />
+		<DashboardBoards />
 		<div class="sidebar__theme">
 			<ThemeToggler />
 		</div>
@@ -15,6 +23,10 @@ const modelValue = defineModel<boolean>();
 			<button class="boards__item heading-m flex items-center w-100" @click="modelValue = !modelValue">
 				<IconsEye />
 				Hide Sidebar
+			</button>
+			<button class="boards__item heading-m flex items-center w-100" @click="logout">
+				<IconsSignout />
+				Logout
 			</button>
 		</div>
 	</aside>
@@ -24,7 +36,7 @@ const modelValue = defineModel<boolean>();
 .sidebar {
 	height: 100vh;
 	background-color: var(--sidebar-background);
-    border-right: 0.1rem solid var(--lines-color);
+	border-right: 0.1rem solid var(--lines-color);
 
 	&__logo {
 		padding: 3.2rem 2.6rem;

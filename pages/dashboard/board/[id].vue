@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import kanban from "@/data/kanban.json";
 import type { Task, ItemToDelete } from "@/types";
-import { useListen, useEvent } from "@/composables/useEventBus";
+import { useEvent } from "@/composables/useEventBus";
 
 definePageMeta({
 	layout: "dashboard",
@@ -9,6 +9,8 @@ definePageMeta({
 
 const route = useRoute();
 const routeId = route.params.id as string;
+const user = useSupabaseUser();
+const client = useSupabaseClient();
 
 const boardsMap: { [key: string]: string } = {
 	"1": "Platform Launch",
@@ -16,6 +18,13 @@ const boardsMap: { [key: string]: string } = {
 	"3": "Roadmap",
 	"4": "Cleanup",
 };
+
+const { data: board } = await useAsyncData("boards", async () => {
+	const { data } = await client.from("boards").select("*, columns(*)").eq("id", routeId).order("created_at").single();
+	return data;
+});
+
+console.log(board.value);
 
 const selectedBoard = kanban.boards.find((board) => board.name === boardsMap[routeId]);
 const selectedTask = ref<Task | null>(null);
@@ -48,19 +57,15 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 	itemToDelete.name = name;
 	setActiveModal(`delete-${type}`);
 };
-
-useListen("add-board", () => {
-	setActiveModal("add-board");
-});
 </script>
 
 <template>
-	<div v-if="selectedBoard" class="single-board">
+	<div v-if="board" class="single-board">
 		<div class="single-board__header flex items-center content-space-between">
 			<div class="single-board__header--left flex items-center">
 				<TheLogo variant="mobile" />
 				<p class="single-board__header__title heading-xl primary-text flex items-center" @click="useEvent('show-sidebar')">
-					<span>{{ selectedBoard.name }}</span>
+					<span>{{ board.title }}</span>
 					<IconsArrow variant="down" />
 				</p>
 			</div>
@@ -73,19 +78,20 @@ useListen("add-board", () => {
 					<DropdownToggler @click="showBoardOptions = !showBoardOptions" />
 					<DropdownList :show="showBoardOptions" width="19.2rem" top="calc(100% + 2.2rem)" right="0rem" gap="1.6rem" @outside-clicked="showBoardOptions = false">
 						<DropdownListItem @click.stop="setActiveModal('edit-board')">Edit Board</DropdownListItem>
-						<DropdownListItem :is-delete="true" @click.stop="deleteBoardOrTask({ id: '1', name: selectedBoard.name, type: 'board' })">Delete Board</DropdownListItem>
+						<DropdownListItem :is-delete="true" @click.stop="deleteBoardOrTask({ id: '1', name: board.title, type: 'board' })">Delete Board</DropdownListItem>
 					</DropdownList>
 				</div>
 			</div>
 		</div>
-		<div class="single-board__body" :class="{ 'flex items-center content-center': selectedBoard?.columns.length === 0 }">
-			<div v-if="selectedBoard && selectedBoard.columns.length > 0" class="single-board__content flex">
-				<section class="single-board__column" v-for="column in selectedBoard.columns" :key="column.name">
+		<div class="single-board__body" :class="{ 'flex items-center content-center': board?.columns.length === 0 }">
+			<div v-if="board && board.columns.length > 0" class="single-board__content flex">
+				<section class="single-board__column" v-for="column in board.columns" :key="column.name">
 					<h6 class="medium-grey-text heading-s text-uppercase single-board__column__name flex items-center">
 						<span class="single-board__column__color block border-rounded"></span>
-						{{ column.name }} ({{ column.tasks.length }})
+						{{ column.name }}
+						<!-- {{ column.name }} ({{ column.tasks.length }}) -->
 					</h6>
-					<div class="single-board__tasks flex flex-column">
+					<div v-if="column.tasks && column.tasks > 0" class="single-board__tasks flex flex-column">
 						<DashboardBoardCard v-for="task in column.tasks" :key="task.title" :task="task" @show-task="showSingleTask(column.name, task.title)" />
 					</div>
 				</section>
@@ -97,7 +103,7 @@ useListen("add-board", () => {
 
 	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
 	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" @close-modal="setActiveModal('')" />
-	<BoardCreateUpdateModal v-if="activeModal === 'add-board' || activeModal === 'edit-board'" :show="activeModal === 'add-board' || activeModal === 'edit-board'" :view="activeModal" :board="selectedBoard" @close-modal="setActiveModal('')" />
+	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @close-modal="setActiveModal('')" />
 	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @cancel-action="setActiveModal('')" />
 </template>
 

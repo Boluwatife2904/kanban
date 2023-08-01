@@ -39,10 +39,22 @@ export default defineNuxtConfig({
 		},
 	},
 	css: ["@/assets/scss/index.scss", "@/assets/scss/fonts.scss"],
-	modules: ["@nuxtjs/supabase"],
+	modules: ["@nuxtjs/supabase", "@pinia/nuxt"],
 	runtimeConfig: {
 		public: {
 			frontendBaseUrl: process.env.FRONTEND_BASE_URL,
 		},
 	},
+	pinia: {
+		autoImports: ["defineStore", "storeToRefs", "acceptHMRUpdate"],
+	},
+	// supabase: {
+	// 	client: {
+	// 		auth: {
+	// 			autoRefreshToken: true,
+	// 			persistSession: true,
+	// 			detectSessionInUrl: true
+	// 		},
+	// 	},
+	// },
 });
