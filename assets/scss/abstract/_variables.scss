@@ -16,6 +16,8 @@
 	--sidebar-background: #ffffff;
 	--lines-color: #e4ebfa;
 	--add-column-background: linear-gradient(180deg, #e9effa 0%, rgba(233, 239, 250, 0.5) 100%);
+	--loader-primary: #20212c;
+	--loader-secondary: #3332;
 }
 
 /* Define styles for the root window with dark - mode preference */
@@ -31,4 +33,6 @@
 	--secondary-color: #fff;
 	--secondary-color-hover: #fff;
 	--add-column-background: linear-gradient(180deg, rgba(43, 44, 55, 0.25) 0%, rgba(43, 44, 55, 0.13) 100%);
+	--loader-primary: #fff;
+	--loader-secondary: #fff2;
 }

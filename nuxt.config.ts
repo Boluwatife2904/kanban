@@ -20,4 +20,9 @@ export default defineNuxtConfig({
 	},
 	css: ["@/assets/scss/index.scss", "@/assets/scss/fonts.scss"],
 	modules: ["@nuxtjs/supabase"],
+	runtimeConfig: {
+		public: {
+			frontendBaseUrl: process.env.FRONTEND_BASE_URL
+		}
+	}
 });

@@ -34,7 +34,11 @@ const loginOrSignup = async () => {
 		isLoading.value = false;
 	}
 };
-const loginWithGoogle = () => {};
+const loginWithGoogle = async () => {
+	const config = useRuntimeConfig();
+	const baseUrl = config.public.frontendBaseUrl;
+	await authClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${baseUrl}/provider` } });
+};
 const gotoForgotPassword = () => navigateTo({ name: "forgot-password" });
 const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : navigateTo({ name: "index" }));
 </script>

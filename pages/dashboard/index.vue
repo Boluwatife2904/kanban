@@ -1,22 +1,24 @@
 <script setup lang="ts">
 definePageMeta({
 	layout: "dashboard",
+	middleware: "auth",
 });
 const user = useSupabaseUser();
 const authClient = useSupabaseAuthClient();
 
-const logout = async () => {
-	await authClient.auth.signOut();
-	useEvent("notify", { type: "success", message: "You have been logged out successfully" });
-	navigateTo({ name: "index" }, { replace: true });
+const logout = () => {
+	authClient.auth.signOut().then(() => {
+		useEvent("notify", { type: "success", message: "You have been logged out successfully" });
+		navigateTo({ name: "index" }, { replace: true });
+	});
 };
 </script>
 
 <template>
 	<div>
-		<pre>{{ user }}</pre>
+		<pre class="primary-text">{{ user }}</pre>
 
-		<button @click="logout">Logout</button>
+		<BaseButton @click="logout">Logout</BaseButton>
 	</div>
 </template>
 
