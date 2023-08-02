@@ -1,32 +1,22 @@
 <script setup lang="ts">
-import kanban from "@/data/kanban.json";
 import type { Task, ItemToDelete } from "@/types";
 import { useEvent } from "@/composables/useEventBus";
 
 definePageMeta({
 	layout: "dashboard",
+	middleware: "auth",
 });
 
 const route = useRoute();
 const routeId = route.params.id as string;
-const user = useSupabaseUser();
 const client = useSupabaseClient();
-
-const boardsMap: { [key: string]: string } = {
-	"1": "Platform Launch",
-	"2": "Marketing Plan",
-	"3": "Roadmap",
-	"4": "Cleanup",
-};
+const { deleteBoard } = useBoardStore();
 
 const { data: board } = await useAsyncData("boards", async () => {
 	const { data } = await client.from("boards").select("*, columns(*)").eq("id", routeId).order("created_at").single();
 	return data;
 });
 
-console.log(board.value);
-
-const selectedBoard = kanban.boards.find((board) => board.name === boardsMap[routeId]);
 const selectedTask = ref<Task | null>(null);
 const showBoardOptions = ref(false);
 const activeModal = ref("");
@@ -57,6 +47,15 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 	itemToDelete.name = name;
 	setActiveModal(`delete-${type}`);
 };
+
+const confirmDeletion = () => {
+	setActiveModal("");
+	useEvent("notify", { type: "success", message: `${capitalizeFirstLetter(itemToDelete.type)} have been successfully deleted!` });
+	if (itemToDelete.type === "board") {
+		deleteBoard(itemToDelete.id);
+		navigateTo({ name: "dashboard" }, { replace: true });
+	}
+};
 </script>
 
 <template>
@@ -78,7 +77,7 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 					<DropdownToggler @click="showBoardOptions = !showBoardOptions" />
 					<DropdownList :show="showBoardOptions" width="19.2rem" top="calc(100% + 2.2rem)" right="0rem" gap="1.6rem" @outside-clicked="showBoardOptions = false">
 						<DropdownListItem @click.stop="setActiveModal('edit-board')">Edit Board</DropdownListItem>
-						<DropdownListItem :is-delete="true" @click.stop="deleteBoardOrTask({ id: '1', name: board.title, type: 'board' })">Delete Board</DropdownListItem>
+						<DropdownListItem :is-delete="true" @click.stop="deleteBoardOrTask({ id: board.id, name: board.title, type: 'board' })">Delete Board</DropdownListItem>
 					</DropdownList>
 				</div>
 			</div>
@@ -104,7 +103,7 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
 	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" @close-modal="setActiveModal('')" />
 	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @close-modal="setActiveModal('')" />
-	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @cancel-action="setActiveModal('')" />
+	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @confirm-action="confirmDeletion" @cancel-action="setActiveModal('')" />
 </template>
 
 <style lang="scss" scoped>

@@ -2,7 +2,7 @@
 const notifications = ref<{ _id: number; type: string; message: string }[]>([]);
 
 const addNewNotification = (type: string, message: string) => {
-	notifications.value.splice(notifications.value.length, 0, { _id: Math.floor(Math.random() * notifications.value.length), type, message });
+	notifications.value.unshift({ _id: Math.floor(Math.random() * notifications.value.length), type, message });
 	setTimeout(() => {
 		notifications.value.splice(notifications.value.length - 1, 1);
 	}, 5000);

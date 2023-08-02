@@ -7,7 +7,6 @@ export interface Task {
 	title: string;
 	description: string;
 	status: string;
-	subtasks: SubTask[];
 }
 
 export interface Board {

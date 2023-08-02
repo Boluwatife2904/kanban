@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useEvent } from "@/composables/useEventBus";
-import { useBoardStore } from "@/stores/board";
 
 const { boards } = storeToRefs(useBoardStore());
 </script>

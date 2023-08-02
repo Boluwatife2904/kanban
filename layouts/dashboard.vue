@@ -1,25 +1,15 @@
 <script setup lang="ts">
 import { useListen } from "@/composables/useEventBus";
-import { useBoardStore } from "@/stores/board";
 
 const sidebarIsHidden = ref(false);
 
 const route = useRoute();
 const showMobileSidebar = ref(false);
 const activeModal = ref("");
-const user = useSupabaseUser();
-const client = useSupabaseClient();
-const { setBoards } = useBoardStore();
 
 const setActiveModal = (modalType: string) => {
 	activeModal.value = modalType;
 };
-
-const { data: boards } = await useAsyncData("boards", async () => {
-	const { data } = await client.from("boards").select("*").eq("user_id", user.value?.id).order("created_at");
-	return data;
-});
-setBoards(boards.value);
 
 watch(
 	() => route.fullPath,

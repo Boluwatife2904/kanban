@@ -15,7 +15,7 @@ const props = defineProps<Props>();
 
 const client = useSupabaseClient();
 const user = useSupabaseUser();
-const authClient = useSupabaseAuthClient()
+const { addBoard } = useBoardStore();
 
 const title = ref("");
 const columns = ref([
@@ -25,9 +25,9 @@ const columns = ref([
 const isLoading = ref(false);
 
 if (props.view === "edit-board" && props.board) {
-	newBoard.title = props.board.title;
-	newBoard.columns = props.board.columns.map(({ name }) => {
-		return { name };
+	title.value = props.board.title;
+	columns.value = props.board.columns.map(({ name, id }) => {
+		return { name, id };
 	});
 }
 
@@ -40,17 +40,16 @@ const createOrUpdateBoard = async () => {
 		});
 		const { error: boardError } = await client.from("boards").insert(boardData);
 		const { error: columnsError } = await client.from("columns").insert(newColumns);
-		console.log(boardError, columnsError);
 		if (boardError || columnsError) {
 			isLoading.value = false;
 			useEvent("notify", { type: "error", message: "An error occurred trying to create the board. Please try again." });
 			return;
 		}
+		addBoard(boardData);
 		useEvent("notify", { type: "success", message: "New board created successfully." });
 		isLoading.value = false;
 		emits("close-modal");
 	}
-	console.log("Something something dey happen >>>>>>>>");
 };
 
 const addNewColumn = () => {

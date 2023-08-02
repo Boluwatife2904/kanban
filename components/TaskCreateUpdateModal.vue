@@ -25,28 +25,27 @@ const newTask: Task = reactive({
 	title: "",
 	description: "",
 	status: "",
-	subtasks: [
-		{ title: "", isCompleted: false },
-		{ title: "", isCompleted: false },
-	],
 });
+
+const subtasks = ref([
+	{ title: "", isCompleted: false },
+	{ title: "", isCompleted: false },
+]);
 
 if (props.view === "edit-task" && props.task) {
 	newTask.title = props.task.title;
 	newTask.description = props.task.description;
 	newTask.status = props.task.status;
-	newTask.subtasks = props.task.subtasks;
-	console.log(props.task);
 }
 
 const createOrUpdateTask = () => {};
 
 const addNewSubtask = () => {
-	newTask.subtasks.push({ title: "", isCompleted: false });
+	subtasks.value.push({ title: "", isCompleted: false });
 };
 
 const removeSubtask = (taskTitle: string) => {
-	newTask.subtasks = newTask.subtasks.filter((subtask) => subtask.title !== taskTitle);
+	subtasks.value = subtasks.value.filter((subtask) => subtask.title !== taskTitle);
 };
 </script>
 
@@ -65,7 +64,7 @@ recharge the batteries a little."
 					/>
 					<BaseInputWrapper label="Subtasks">
 						<div class="task-form__subtasks flex flex-column">
-							<div v-for="(subtask, index) in newTask.subtasks" :key="index" class="task-form__subtask flex items-center">
+							<div v-for="(subtask, index) in subtasks" :key="index" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
 								<button @click="removeSubtask(subtask.title)"><IconsClose /></button>
 							</div>

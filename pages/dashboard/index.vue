@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import { useBoardStore } from "@/stores/board";
-
 definePageMeta({
 	layout: "dashboard",
 	middleware: "auth",
 });
 const user = useSupabaseUser();
-const client = useSupabaseClient();
 const { boards } = storeToRefs(useBoardStore());
-
-const deleteFromSupabase = async (from: string, item: string) => {
-	console.log("Deleteing", from, item);
-	const { error } = await client.from(from).delete().eq("id", item);
-	console.log(error);
-};
 
 const viewBoard = (boardId: string) => {
 	navigateTo({ name: "dashboard-board-id", params: { id: boardId } });

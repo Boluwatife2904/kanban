@@ -4,13 +4,13 @@ definePageMeta({
 	middleware: "guest",
 });
 
-const { selectedTheme } = useTheme();
+const config = useRuntimeConfig();
 const authClient = useSupabaseAuthClient();
+const { selectedTheme } = useTheme();
 const email = ref("");
 const isLoading = ref(false);
 
 const sendResetInstructions = async () => {
-	const config = useRuntimeConfig();
 	const baseUrl = config.public.frontendBaseUrl;
 	isLoading.value = true;
 	const { error } = await authClient.auth.resetPasswordForEmail(email.value, { redirectTo: `${baseUrl}/change-password` });

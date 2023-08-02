@@ -48,13 +48,7 @@ export default defineNuxtConfig({
 	pinia: {
 		autoImports: ["defineStore", "storeToRefs", "acceptHMRUpdate"],
 	},
-	// supabase: {
-	// 	client: {
-	// 		auth: {
-	// 			autoRefreshToken: true,
-	// 			persistSession: true,
-	// 			detectSessionInUrl: true
-	// 		},
-	// 	},
-	// },
+	imports: {
+		dirs: ["stores"],
+	},
 });

@@ -1,13 +1,15 @@
 <script setup lang="ts">
+const { fetchBoards } = useBoardStore();
 const user = useSupabaseUser();
+const showAlert = ref(true);
 
-onMounted(() => {
-	watch(user, (user) => {
-		if (user) {
-			useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
-			navigateTo({ name: "dashboard" }, { replace: true });
-		}
-	});
+watchEffect(async () => {
+	if (user.value) {
+		await fetchBoards();
+		if(showAlert.value)useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
+		showAlert.value = false;
+		return navigateTo({ name: "dashboard" }, { replace: true });
+	}
 });
 </script>
 

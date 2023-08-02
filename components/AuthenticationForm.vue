@@ -3,6 +3,7 @@ interface Props {
 	mode: "login" | "signup";
 }
 const authClient = useSupabaseAuthClient();
+const { fetchBoards } = useBoardStore()
 const { mode = "login" } = defineProps<Props>();
 
 const formData = reactive({
@@ -21,6 +22,7 @@ const loginOrSignup = async () => {
 			useEvent("notify", { type: "error", message: error.message });
 			return;
 		}
+		await fetchBoards();
 		useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
 		navigateTo({ name: "dashboard" }, { replace: true });
 		isLoading.value = false;
@@ -31,6 +33,7 @@ const loginOrSignup = async () => {
 			useEvent("notify", { type: "error", message: error.message });
 			return;
 		}
+		await fetchBoards();
 		isLoading.value = false;
 		useEvent("notify", { type: "success", message: "Account created successfully. Have fun!" });
 		navigateTo({ name: "dashboard" }, { replace: true });

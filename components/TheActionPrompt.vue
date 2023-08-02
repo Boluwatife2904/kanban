@@ -11,13 +11,27 @@ interface Emits {
 	(event: "cancel-action"): void;
 }
 
-defineEmits<Emits>();
+const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
+const client = useSupabaseClient();
+const isLoading = ref(false);
 
 const deleteMessage = computed(() => {
 	if (props.itemToDelete.type === "board") return `Are you sure you want to delete the '${props.itemToDelete.name}' board? This action will remove all columns and tasks and cannot be reversed.`;
 	return `Are you sure you want to delete the '${props.itemToDelete.name}' task and its subtasks? This action cannot be reversed.`;
 });
+
+const confirmActionDeletion = async () => {
+	isLoading.value = true;
+	const { error } = await client.from(`${props.itemToDelete.type}s`).delete().eq("id", props.itemToDelete.id);
+	if (error) {
+		isLoading.value = false;
+		useEvent("notify", { type: "error", message: `An occurred trying to delete this ${props.itemToDelete.type}` });
+		return;
+	}
+	isLoading.value = false;
+	emits("confirm-action");
+};
 </script>
 
 <template>
@@ -28,7 +42,7 @@ const deleteMessage = computed(() => {
 		<template #content>
 			<p class="body-l medium-grey-text">{{ deleteMessage }}</p>
 			<div class="delete-actions grid">
-				<BaseButton variant="destructive" size="large" @click="$emit('confirm-action')"> Delete </BaseButton>
+				<BaseButton variant="destructive" size="large" :is-loading="isLoading" @click="confirmActionDeletion"> Delete </BaseButton>
 				<BaseButton variant="secondary" size="large" @click="$emit('cancel-action')"> Cancel </BaseButton>
 			</div>
 		</template>
