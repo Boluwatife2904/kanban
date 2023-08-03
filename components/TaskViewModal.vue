@@ -26,7 +26,7 @@ const editTask = () => {
 	if (props.task) emits("edit-task");
 };
 const deleteTask = () => {
-	if (props.task) emits("delete-task", { name: props.task.title, id: "1", type: "task" });
+	if (props.task) emits("delete-task", { name: props.task.title, id: props.task.id, type: "task", });
 };
 </script>
 

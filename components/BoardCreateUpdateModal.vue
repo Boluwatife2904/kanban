@@ -71,7 +71,7 @@ const removeColumn = (columnId: string) => {
 						<div class="board-form__columns flex flex-column">
 							<div v-for="(item, index) in columns" :key="item.id" class="board-form__column flex items-center">
 								<BaseInput v-model="item.name" type="text" :id="item.name" :placeholder="index % 2 === 0 ? 'e.g. Todo' : 'e.g. Doing'" />
-								<button type="button" @click="removeColumn(item.id)"><IconsClose /></button>
+								<button :disabled="columns.length === 1 && index === 0" type="button" @click="removeColumn(item.id)"><IconsClose /></button>
 							</div>
 							<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 						</div>
@@ -106,6 +106,10 @@ const removeColumn = (columnId: string) => {
 			&:hover {
 				color: var(--destructive-color);
 			}
+		}
+
+		span {
+			min-width: 1.5rem;
 		}
 	}
 }

@@ -63,8 +63,9 @@ const viewBoard = (boardId: string) => {
 
 	&__boards {
 		&__wrapper {
-			grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
 			gap: 3rem;
+			grid-template-columns: repeat(3, 1fr);
+
 
 			li {
 				background-color: var(--sidebar-background);

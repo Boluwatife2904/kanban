@@ -24,11 +24,7 @@ if (!board.value) {
 const selectedTask = ref<Task | null>(null);
 const showBoardOptions = ref(false);
 const activeModal = ref("");
-const itemToDelete = reactive<ItemToDelete>({
-	id: "",
-	type: "",
-	name: "",
-});
+const itemToDelete = reactive<ItemToDelete>({ id: "", type: "", name: "" });
 const taskColumns = computed(() => {
 	return board.value!.columns.map(({ id, name }: { id: string; name: string }) => ({ value: id, content: name }));
 });
@@ -57,11 +53,16 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 
 const confirmDeletion = () => {
 	setActiveModal("");
-	useEvent("notify", { type: "success", message: `${capitalizeFirstLetter(itemToDelete.type)} have been successfully deleted!` });
 	if (itemToDelete.type === "board") {
 		deleteBoard(itemToDelete.id);
 		navigateTo({ name: "dashboard" }, { replace: true });
+	} else if (itemToDelete.type === "task") {
+		const taskColumn = board.value?.columns.find((column) => column.id === selectedTask.value?.status);
+		if (taskColumn) {
+			taskColumn.tasks = taskColumn?.tasks.filter((task) => task.id !== itemToDelete.id);
+		}
 	}
+	useEvent("notify", { type: "success", message: `${capitalizeFirstLetter(itemToDelete.type)} have been successfully deleted!` });
 };
 
 const addNewTaskToColumn = (task: TaskWithSubtasks) => {
