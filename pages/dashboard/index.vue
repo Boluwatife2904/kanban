@@ -5,6 +5,7 @@ definePageMeta({
 });
 const user = useSupabaseUser();
 const { boards } = storeToRefs(useBoardStore());
+const { logout } = useStore();
 
 const viewBoard = (boardId: string) => {
 	navigateTo({ name: "dashboard-board-id", params: { id: boardId } });
@@ -19,7 +20,7 @@ const viewBoard = (boardId: string) => {
 		<div class="dashboard__content">
 			<div class="dashboard__greeting flex flex-column">
 				<h4 class="primary-text heading-l">Hello {{ user?.email?.split("@")[0] }} 👋🏽,</h4>
-				<p class="primary-text body-l">Welcome back to Kanban!</p>
+				<p class="primary-text body-l">Welcome back to Kanban! <span class="logout cursor-pointer" @click="logout">Logout</span></p>
 			</div>
 			<div class="dashboard__boards">
 				<h4 class="dashboard__boards__heading"></h4>
@@ -77,5 +78,9 @@ const viewBoard = (boardId: string) => {
 			}
 		}
 	}
+}
+
+.logout {
+	border-bottom: 1px solid var(--primary-text);
 }
 </style>

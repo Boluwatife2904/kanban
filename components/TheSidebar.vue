@@ -1,13 +1,6 @@
 <script setup lang="ts">
 const modelValue = defineModel<boolean>();
-const authClient = useSupabaseAuthClient();
-
-const logout = () => {
-	authClient.auth.signOut().then(() => {
-		useEvent("notify", { type: "success", message: "You have been logged out successfully!" });
-		navigateTo({ name: "index" }, { replace: true });
-	});
-};
+const { logout } = useStore();
 </script>
 
 <template>
