@@ -13,7 +13,7 @@ const client = useSupabaseClient();
 const { deleteBoard } = useBoardStore();
 
 const { data: board } = await useAsyncData("boards", async () => {
-	const { data } = await client.from("boards").select("*, columns(*, tasks(*))").eq("id", routeId).order("created_at").single();
+	const { data } = await client.from("boards").select("*, columns(*, tasks(*, subtasks(*)))").eq("id", routeId).order("created_at").single();
 	return data as unknown as Board;
 });
 
@@ -69,6 +69,12 @@ const addNewTaskToColumn = (task: TaskWithSubtasks) => {
 	const selectedColumnIndex = board.value?.columns.findIndex((column) => column.id === task.status) as number;
 	board.value?.columns[selectedColumnIndex].tasks.push(task);
 };
+
+const updateTaskInColumn = (task: TaskWithSubtasks) => {
+	console.log(task); // handle updating of a task locally
+	// const selectedColumnIndex = board.value?.columns.findIndex((column) => column.id === task.status) as number;
+	// board.value?.columns[selectedColumnIndex].tasks.push(task);
+};
 </script>
 
 <template>
@@ -113,7 +119,7 @@ const addNewTaskToColumn = (task: TaskWithSubtasks) => {
 	</div>
 
 	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" :options="taskColumns" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
-	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" :options="taskColumns" :board-id="board?.id ?? ''" @add-task="addNewTaskToColumn" @close-modal="setActiveModal('')" />
+	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" :options="taskColumns" :board-id="board?.id ?? ''" @add-task="addNewTaskToColumn" @edit-task="updateTaskInColumn" @close-modal="setActiveModal('')" />
 	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @close-modal="setActiveModal('')" />
 	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @confirm-action="confirmDeletion" @cancel-action="setActiveModal('')" />
 </template>

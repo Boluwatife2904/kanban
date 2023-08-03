@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Task } from "@/types";
+import type { TaskWithSubtasks } from "@/types";
 
 interface Props {
-	task: Task;
+	task: TaskWithSubtasks;
 }
 
 interface Emits {
@@ -12,15 +12,13 @@ interface Emits {
 defineEmits<Emits>();
 const props = defineProps<Props>();
 
-// const numberOfCompletedTasks = computed(() => props.task.subtasks.filter((task) => task.isCompleted).length);
-const numberOfCompletedTasks = 0;
+const numberOfCompletedTasks = computed(() => props.task.subtasks.filter((task) => task.isCompleted).length);
 </script>
 
 <template>
 	<div class="board-card flex flex-column" @click="$emit('show-task')">
 		<h5 class="board-card__title heading-m">{{ task.title }}</h5>
-		<!-- <p class="medium-grey-text body-m">{{ numberOfCompletedTasks }} of {{ task.subtasks.length }} subtasks</p> -->
-		<p class="medium-grey-text body-m">{{ 0}} of {{ 0 }} subtasks</p>
+		<p class="medium-grey-text body-m">{{ numberOfCompletedTasks }} of {{ task.subtasks.length }} subtasks</p>
 	</div>
 </template>
 

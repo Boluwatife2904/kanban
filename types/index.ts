@@ -1,6 +1,11 @@
 export interface SubTask {
+	id: string;
 	title: string;
 	isCompleted: boolean;
+	user_id: string;
+	board_id: string;
+	column_id: string;
+	task_id: string;
 }
 
 export interface Task {
@@ -8,12 +13,12 @@ export interface Task {
 	title: string;
 	description: string;
 	status: string;
-	user_id: string
-	board_id: string
+	user_id: string;
+	board_id: string;
 }
 
 export interface TaskWithSubtasks extends Task {
-	subtasks: SubTask[]
+	subtasks: SubTask[];
 }
 
 export interface Board {
@@ -27,7 +32,7 @@ export interface Board {
 }
 
 export interface Column {
-    name: string
+	name: string;
 }
 
 export interface BoardItem {

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Task, ItemToDelete, Option } from "@/types";
+import type { ItemToDelete, Option, TaskWithSubtasks } from "@/types";
 
 interface Props {
 	show: boolean;
 	view: string;
-	task: Task | null;
+	task: TaskWithSubtasks | null;
 	options: Option[];
 }
 
@@ -19,8 +19,7 @@ const props = defineProps<Props>();
 
 const showTaskOptions = ref(false);
 const todoStatus = props.options.find((option) => option.value === props.task?.status)?.content;
-// const numberOfCompletedTasks = computed(() => props.task?.subtasks.filter((task) => task.isCompleted).length);
-const numberOfCompletedTasks = 0;
+const numberOfCompletedTasks = computed(() => props.task?.subtasks.filter((task) => task.isCompleted).length);
 
 const editTask = () => {
 	if (props.task) emits("edit-task");
@@ -46,9 +45,9 @@ const deleteTask = () => {
 				</div>
 				<p v-if="task.description" class="single-task__description body-l medium-grey-text">{{ task.description }}</p>
 				<div class="single-task__subtasks flex flex-column">
-					<!-- <p class="single-task__subtasks__title medium-grey-text body-m">Subtasks ({{ numberOfCompletedTasks }} of {{ task.subtasks.length }})</p> -->
+					<p class="single-task__subtasks__title medium-grey-text body-m">Subtasks ({{ numberOfCompletedTasks }} of {{ task.subtasks.length }})</p>
 					<div class="single-task__subtasks__list flex flex-column">
-						<!-- <BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.title" v-model="subtask.isCompleted" :id="subtask.title" :name="subtask.title" :label="subtask.title" /> -->
+						<BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.title" v-model="subtask.isCompleted" :id="subtask.title" :name="subtask.title" :label="subtask.title" />
 					</div>
 				</div>
 				<BaseInputWrapper label="Current Status">

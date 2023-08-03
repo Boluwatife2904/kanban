@@ -13,6 +13,7 @@ interface Props {
 interface Emits {
 	(event: "close-modal"): void;
 	(event: "add-task", data: TaskWithSubtasks): void;
+	(event: "edit-task", data: TaskWithSubtasks): void;
 }
 
 const emits = defineEmits<Emits>();
@@ -21,28 +22,32 @@ const client = useSupabaseClient();
 const user = useSupabaseUser();
 
 const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id: user.value?.id ?? "", board_id: props.boardId });
+if (props.view === "edit-task" && props.task) {
+	newTask.title = props.task.title;
+	newTask.description = props.task.description;
+	newTask.status = props.task.status;
+	newTask.id = props.task.id;
+}
 const subtasks = ref([
 	{ id: uuidv4(), title: "", isCompleted: false },
 	{ id: uuidv4(), title: "", isCompleted: false },
 ]);
 const isLoading = ref(false);
 
-if (props.view === "edit-task" && props.task) {
-	newTask.title = props.task.title;
-	newTask.description = props.task.description;
-	newTask.status = props.task.status;
-}
-
 const createOrUpdateTask = async () => {
 	isLoading.value = true;
-	const { error: taskError } = await client.from("tasks").insert(newTask);
-	if (taskError) {
+	const mappedSubtasks = subtasks.value.map(({ id, title, isCompleted }) => {
+		return { id, title, isCompleted, user_id: user.value?.id ?? "", board_id: props.boardId, column_id: newTask.status, task_id: newTask.id };
+	});
+	const { error: taskError } = await client.from("tasks").upsert(newTask);
+	const { error: subtasksError } = await client.from("subtasks").upsert(mappedSubtasks);
+	if (taskError || subtasksError) {
 		isLoading.value = false;
-		useEvent("notify", { type: "error", message: "An error occurred trying to create the task. Please try again." });
+		useEvent("notify", { type: "error", message: `An error occurred trying to ${props.view === "add-task" ? "create" : "update"} the task. Please try again.` });
 		return;
 	}
-	emits("add-task", newTask)
-	useEvent("notify", { type: "success", message: "New task created successfully." });
+	props.view === "edit-task" ? emits("edit-task", { ...newTask, subtasks: mappedSubtasks }) : emits("add-task", { ...newTask, subtasks: mappedSubtasks });
+	useEvent("notify", { type: "success", message: `${props.view === "add-task" ? "New task created" : "Task updated"} successfully.` });
 	isLoading.value = false;
 	emits("close-modal");
 };
