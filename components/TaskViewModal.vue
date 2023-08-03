@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { Task, ItemToDelete } from "@/types";
+import type { Task, ItemToDelete, Option } from "@/types";
 
 interface Props {
 	show: boolean;
 	view: string;
 	task: Task | null;
+	options: Option[];
 }
 
 interface Emits {
@@ -17,13 +18,9 @@ const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 
 const showTaskOptions = ref(false);
-const options = [
-	{ value: "Todo", content: "Todo" },
-	{ value: "Doing", content: "Doing" },
-	{ value: "Progress", content: "Progress" },
-	{ value: "Done", content: "Done" },
-];
-const numberOfCompletedTasks = computed(() => props.task?.subtasks.filter((task) => task.isCompleted).length);
+const todoStatus = props.options.find((option) => option.value === props.task?.status)?.content;
+// const numberOfCompletedTasks = computed(() => props.task?.subtasks.filter((task) => task.isCompleted).length);
+const numberOfCompletedTasks = 0;
 
 const editTask = () => {
 	if (props.task) emits("edit-task");
@@ -49,14 +46,14 @@ const deleteTask = () => {
 				</div>
 				<p v-if="task.description" class="single-task__description body-l medium-grey-text">{{ task.description }}</p>
 				<div class="single-task__subtasks flex flex-column">
-					<p class="single-task__subtasks__title medium-grey-text body-m">Subtasks ({{ numberOfCompletedTasks }} of {{ task.subtasks.length }})</p>
+					<!-- <p class="single-task__subtasks__title medium-grey-text body-m">Subtasks ({{ numberOfCompletedTasks }} of {{ task.subtasks.length }})</p> -->
 					<div class="single-task__subtasks__list flex flex-column">
-						<BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.title" v-model="subtask.isCompleted" :id="subtask.title" :name="subtask.title" :label="subtask.title" />
+						<!-- <BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.title" v-model="subtask.isCompleted" :id="subtask.title" :name="subtask.title" :label="subtask.title" /> -->
 					</div>
 				</div>
-				<div class="single-task__status">
-					<BaseDropdown :options="options" v-model="task.status" label="Current Status" />
-				</div>
+				<BaseInputWrapper label="Current Status">
+					<span class="body-m primary-text">{{ todoStatus }}</span>
+				</BaseInputWrapper>
 			</div>
 		</template>
 	</LazyBaseModal>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Task, ItemToDelete } from "@/types";
+import type { Task, ItemToDelete, Board, TaskWithSubtasks } from "@/types";
 import { useEvent } from "@/composables/useEventBus";
 
 definePageMeta({
@@ -13,9 +13,13 @@ const client = useSupabaseClient();
 const { deleteBoard } = useBoardStore();
 
 const { data: board } = await useAsyncData("boards", async () => {
-	const { data } = await client.from("boards").select("*, columns(*)").eq("id", routeId).order("created_at").single();
-	return data;
+	const { data } = await client.from("boards").select("*, columns(*, tasks(*))").eq("id", routeId).order("created_at").single();
+	return data as unknown as Board;
 });
+
+if (!board.value) {
+	throw createError({ statusCode: 404, statusMessage: "Board Not Found" });
+}
 
 const selectedTask = ref<Task | null>(null);
 const showBoardOptions = ref(false);
@@ -25,15 +29,18 @@ const itemToDelete = reactive<ItemToDelete>({
 	type: "",
 	name: "",
 });
+const taskColumns = computed(() => {
+	return board.value!.columns.map(({ id, name }: { id: string; name: string }) => ({ value: id, content: name }));
+});
 
 const setActiveModal = (modalType: string) => {
 	activeModal.value = modalType;
 };
 
-const showSingleTask = (columnName: string, taskTitle: string) => {
-	const selectedColumn = selectedBoard?.columns.find((column) => column.name === columnName);
+const showSingleTask = (columnId: string, taskId: string) => {
+	const selectedColumn = board.value?.columns.find((column) => column.id === columnId);
 	if (selectedColumn) {
-		const task = selectedColumn.tasks.find((task) => task.title === taskTitle);
+		const task = selectedColumn.tasks.find((task) => task.id === taskId);
 		if (task) {
 			selectedTask.value = task;
 			setActiveModal("view-task");
@@ -55,6 +62,11 @@ const confirmDeletion = () => {
 		deleteBoard(itemToDelete.id);
 		navigateTo({ name: "dashboard" }, { replace: true });
 	}
+};
+
+const addNewTaskToColumn = (task: TaskWithSubtasks) => {
+	const selectedColumnIndex = board.value?.columns.findIndex((column) => column.id === task.status) as number;
+	board.value?.columns[selectedColumnIndex].tasks.push(task);
 };
 </script>
 
@@ -84,14 +96,13 @@ const confirmDeletion = () => {
 		</div>
 		<div class="single-board__body" :class="{ 'flex items-center content-center': board?.columns.length === 0 }">
 			<div v-if="board && board.columns.length > 0" class="single-board__content flex">
-				<section class="single-board__column" v-for="column in board.columns" :key="column.name">
+				<section class="single-board__column" v-for="column in board.columns" :key="column.id">
 					<h6 class="medium-grey-text heading-s text-uppercase single-board__column__name flex items-center">
 						<span class="single-board__column__color block border-rounded"></span>
-						{{ column.name }}
-						<!-- {{ column.name }} ({{ column.tasks.length }}) -->
+						{{ column.name }} ({{ column.tasks.length }})
 					</h6>
-					<div v-if="column.tasks && column.tasks > 0" class="single-board__tasks flex flex-column">
-						<DashboardBoardCard v-for="task in column.tasks" :key="task.title" :task="task" @show-task="showSingleTask(column.name, task.title)" />
+					<div v-if="column.tasks && column.tasks.length > 0" class="single-board__tasks flex flex-column">
+						<DashboardBoardCard v-for="task in column.tasks" :key="task.title" :task="task" @show-task="showSingleTask(column.id, task.id)" />
 					</div>
 				</section>
 				<button class="single-board__column single-board__column--add medium-grey-text heading-xl border-s" @click="setActiveModal('edit-board')">+ New Column</button>
@@ -100,8 +111,8 @@ const confirmDeletion = () => {
 		</div>
 	</div>
 
-	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
-	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" @close-modal="setActiveModal('')" />
+	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" :options="taskColumns" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
+	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" :options="taskColumns" :board-id="board?.id ?? ''" @add-task="addNewTaskToColumn" @close-modal="setActiveModal('')" />
 	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @close-modal="setActiveModal('')" />
 	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @confirm-action="confirmDeletion" @cancel-action="setActiveModal('')" />
 </template>

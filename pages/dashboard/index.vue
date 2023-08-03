@@ -3,6 +3,7 @@ definePageMeta({
 	layout: "dashboard",
 	middleware: "auth",
 });
+
 const user = useSupabaseUser();
 const { boards } = storeToRefs(useBoardStore());
 const { logout } = useStore();

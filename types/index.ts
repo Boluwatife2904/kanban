@@ -1,33 +1,47 @@
-interface SubTask {
+export interface SubTask {
 	title: string;
 	isCompleted: boolean;
 }
 
 export interface Task {
+	id: string;
 	title: string;
 	description: string;
 	status: string;
+	user_id: string
+	board_id: string
+}
+
+export interface TaskWithSubtasks extends Task {
+	subtasks: SubTask[]
 }
 
 export interface Board {
-	name: string;
+	id: string;
+	title: string;
 	columns: {
+		id: string;
 		name: string;
-		tasks: Task[];
-	};
+		tasks: TaskWithSubtasks[];
+	}[];
 }
 
-interface Column {
+export interface Column {
     name: string
 }
 
 export interface BoardItem {
+	id: string;
 	title: string;
-	columns: Column[];
 }
 
 export interface ItemToDelete {
 	id: string;
 	name: string;
 	type: string;
+}
+
+export interface Option {
+	value: string;
+	content: string;
 }

@@ -1,36 +1,31 @@
 <script setup lang="ts">
-import type { Task } from "@/types";
+import { v4 as uuidv4 } from "uuid";
+import type { Task, TaskWithSubtasks, Option } from "@/types";
 
 interface Props {
 	show: boolean;
 	view: string;
 	task?: Task | null;
+	options: Option[];
+	boardId: string;
 }
 
 interface Emits {
 	(event: "close-modal"): void;
+	(event: "add-task", data: TaskWithSubtasks): void;
 }
 
-defineEmits<Emits>();
+const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
+const client = useSupabaseClient();
+const user = useSupabaseUser();
 
-const options = [
-	{ value: "Todo", content: "Todo" },
-	{ value: "Doing", content: "Doing" },
-	{ value: "Progress", content: "Progress" },
-	{ value: "Done", content: "Done" },
-];
-
-const newTask: Task = reactive({
-	title: "",
-	description: "",
-	status: "",
-});
-
+const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id: user.value?.id ?? "", board_id: props.boardId });
 const subtasks = ref([
-	{ title: "", isCompleted: false },
-	{ title: "", isCompleted: false },
+	{ id: uuidv4(), title: "", isCompleted: false },
+	{ id: uuidv4(), title: "", isCompleted: false },
 ]);
+const isLoading = ref(false);
 
 if (props.view === "edit-task" && props.task) {
 	newTask.title = props.task.title;
@@ -38,10 +33,22 @@ if (props.view === "edit-task" && props.task) {
 	newTask.status = props.task.status;
 }
 
-const createOrUpdateTask = () => {};
+const createOrUpdateTask = async () => {
+	isLoading.value = true;
+	const { error: taskError } = await client.from("tasks").insert(newTask);
+	if (taskError) {
+		isLoading.value = false;
+		useEvent("notify", { type: "error", message: "An error occurred trying to create the task. Please try again." });
+		return;
+	}
+	emits("add-task", newTask)
+	useEvent("notify", { type: "success", message: "New task created successfully." });
+	isLoading.value = false;
+	emits("close-modal");
+};
 
 const addNewSubtask = () => {
-	subtasks.value.push({ title: "", isCompleted: false });
+	subtasks.value.push({ id: uuidv4(), title: "", isCompleted: false });
 };
 
 const removeSubtask = (taskTitle: string) => {
@@ -64,7 +71,7 @@ recharge the batteries a little."
 					/>
 					<BaseInputWrapper label="Subtasks">
 						<div class="task-form__subtasks flex flex-column">
-							<div v-for="(subtask, index) in subtasks" :key="index" class="task-form__subtask flex items-center">
+							<div v-for="(subtask, index) in subtasks" :key="subtask.id" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
 								<button @click="removeSubtask(subtask.title)"><IconsClose /></button>
 							</div>
@@ -72,7 +79,7 @@ recharge the batteries a little."
 						</div>
 					</BaseInputWrapper>
 					<BaseDropdown v-model="newTask.status" label="Status" :options="options" />
-					<BaseButton>{{ view === "add-task" ? "Create Task" : "Save Changes" }}</BaseButton>
+					<BaseButton :is-loading="isLoading">{{ view === "add-task" ? "Create Task" : "Save Changes" }}</BaseButton>
 				</form>
 			</div>
 		</template>

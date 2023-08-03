@@ -13,6 +13,7 @@
 		"@nuxtjs/supabase": "^0.3.8",
 		"@pinia/nuxt": "^0.4.11",
 		"@types/node": "^18",
+		"@types/uuid": "^9.0.2",
 		"mitt": "^3.0.0",
 		"nuxt": "^3.6.5",
 		"pinia": "^2.1.6",
