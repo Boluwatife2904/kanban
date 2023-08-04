@@ -1,7 +1,7 @@
 import useStatefulCookie from "~/composables/useStatefulCookie";
 
 export default defineNuxtPlugin(() => {
-	const theme = useStatefulCookie("theme", "light-mode");
+	const theme = useStatefulCookie("theme");
 	const { setTheme } = useTheme();
 	const hasDarkPreference = window.matchMedia("(prefers-color-scheme: dark)").matches;
 

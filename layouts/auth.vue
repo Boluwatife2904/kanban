@@ -16,7 +16,9 @@ const { selectedTheme } = useTheme();
 					<p class="body-l primary-text">- Joseph Kennedy</p>
 				</div>
 				<div class="auth-layout__images">
-                    <img :src="selectedTheme === 'light-mode' ? '/images/demo-light.png' : '/images/demo-dark.png'" alt="Kanban demo" />
+					<ClientOnly>
+						<img :src="selectedTheme === 'light-mode' ? '/images/demo-light.png' : '/images/demo-dark.png'" alt="Kanban demo" />
+					</ClientOnly>
 				</div>
 			</div>
 		</div>
@@ -41,9 +43,9 @@ const { selectedTheme } = useTheme();
 		}
 
 		&__content {
-            width: 100%;
+			width: 100%;
 			max-width: 56rem;
-            margin: 0 auto;
+			margin: 0 auto;
 		}
 	}
 
@@ -53,7 +55,7 @@ const { selectedTheme } = useTheme();
 		display: none;
 
 		@media screen and (min-width: 992px) {
-            display: block;
+			display: block;
 		}
 
 		&__content {
@@ -86,16 +88,16 @@ const { selectedTheme } = useTheme();
 		padding: 10rem 4rem 5rem 10%;
 		gap: 1rem;
 
-        h3 {
-            letter-spacing: 0.075rem;
-            font-weight: 500;
-        }
+		h3 {
+			letter-spacing: 0.075rem;
+			font-weight: 500;
+		}
 
-        p {
-            font-weight: 300;
-            letter-spacing: 0.05;
-            font-size: 1.4rem;
-        }
+		p {
+			font-weight: 300;
+			letter-spacing: 0.05;
+			font-size: 1.4rem;
+		}
 	}
 }
 </style>
