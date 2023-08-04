@@ -12,7 +12,7 @@ const routeId = route.params.id as string;
 const client = useSupabaseClient();
 const { deleteBoard } = useBoardStore();
 
-const { data: board } = await useAsyncData("board-data", async () => {
+const { data: board, refresh } = await useAsyncData("board-data", async () => {
 	const { data } = await client.from("boards").select("*, columns(*, tasks(*, subtasks(*)))").eq("id", routeId).order("created_at").single();
 	return data as unknown as Board;
 });
@@ -70,8 +70,8 @@ const addNewTaskToColumn = (task: TaskWithSubtasks) => {
 	board.value?.columns[selectedColumnIndex].tasks.push(task);
 };
 
-const updateTaskInColumn = (task: TaskWithSubtasks) => {
-	console.log(task); // handle updating of a task locally
+const updateTaskInColumn = async (task: TaskWithSubtasks) => {
+	await refresh()
 	// const selectedColumnIndex = board.value?.columns.findIndex((column) => column.id === task.status) as number;
 	// board.value?.columns[selectedColumnIndex].tasks.push(task);
 };
