@@ -5,7 +5,7 @@ import type { Task, TaskWithSubtasks, Option } from "@/types";
 interface Props {
 	show: boolean;
 	view: string;
-	task?: Task | null;
+	task?: TaskWithSubtasks | null;
 	options: Option[];
 	boardId: string;
 }
@@ -22,16 +22,17 @@ const client = useSupabaseClient();
 const user = useSupabaseUser();
 
 const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id: user.value?.id ?? "", board_id: props.boardId });
+const subtasks = ref([
+	{ id: uuidv4(), title: "", isCompleted: false },
+	{ id: uuidv4(), title: "", isCompleted: false },
+]);
 if (props.view === "edit-task" && props.task) {
 	newTask.title = props.task.title;
 	newTask.description = props.task.description;
 	newTask.status = props.task.status;
 	newTask.id = props.task.id;
+	subtasks.value = props.task.subtasks.map(({ id, title, isCompleted }) => ({ id, title, isCompleted }))
 }
-const subtasks = ref([
-	{ id: uuidv4(), title: "", isCompleted: false },
-	{ id: uuidv4(), title: "", isCompleted: false },
-]);
 const isLoading = ref(false);
 
 const createOrUpdateTask = async () => {
