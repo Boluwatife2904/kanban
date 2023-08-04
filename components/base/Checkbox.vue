@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+	inheritAttrs: false,
+});
+
 interface CheckboxProps {
 	id: string;
 	label?: string;
@@ -13,7 +17,7 @@ const modelValue = defineModel<boolean>();
 
 <template>
 	<label :for="id" class="checkbox border-xs w-100 inline-flex items-center" :class="[{ 'checkbox--background': hasBackground }]">
-		<input :id="id" type="checkbox" v-model="modelValue" :checked="modelValue" />
+		<input :id="id" type="checkbox" v-model="modelValue" :checked="modelValue" v-bind="$attrs" />
 		<div class="box bg-white flex content-center items-center"></div>
 		<span class="body-m checkbox__label" :class="{ 'checkbox__label--checked': modelValue && hasBackground }"> {{ label }} </span>
 	</label>

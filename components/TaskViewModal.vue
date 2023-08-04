@@ -16,6 +16,7 @@ interface Emits {
 
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
+const client = useSupabaseClient();
 
 const showTaskOptions = ref(false);
 const todoStatus = props.options.find((option) => option.value === props.task?.status)?.content;
@@ -25,7 +26,11 @@ const editTask = () => {
 	if (props.task) emits("edit-task");
 };
 const deleteTask = () => {
-	if (props.task) emits("delete-task", { name: props.task.title, id: props.task.id, type: "task", });
+	if (props.task) emits("delete-task", { name: props.task.title, id: props.task.id, type: "task" });
+};
+const updateSubtaskCompletedStatus = async (event: Event) => {
+	const { id, checked } = event.target as HTMLInputElement;
+	await client.from("subtasks").update({ isCompleted: checked }).eq("id", id);
 };
 </script>
 
@@ -47,7 +52,7 @@ const deleteTask = () => {
 				<div class="single-task__subtasks flex flex-column">
 					<p class="single-task__subtasks__title medium-grey-text body-m">Subtasks ({{ numberOfCompletedTasks }} of {{ task.subtasks.length }})</p>
 					<div class="single-task__subtasks__list flex flex-column">
-						<BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.title" v-model="subtask.isCompleted" :id="subtask.title" :name="subtask.title" :label="subtask.title" />
+						<BaseCheckbox v-for="subtask in task.subtasks" :key="subtask.id" v-model="subtask.isCompleted" :id="subtask.id" :name="subtask.id" :label="subtask.title" @change="updateSubtaskCompletedStatus" />
 					</div>
 				</div>
 				<BaseInputWrapper label="Current Status">

@@ -6,7 +6,7 @@ export const useBoardStore = defineStore("board", () => {
 	const user = useSupabaseUser();
 
 	const fetchBoards = async () => {
-		const { data, error } = await useAsyncData("boards-data", async () => {
+		const { data, error } = await useAsyncData("boards", async () => {
 			const { data } = await client.from("boards").select("*").eq("user_id", user.value?.id).order("created_at");
 			return data as unknown as BoardItem[];
 		});

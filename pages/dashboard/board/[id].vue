@@ -12,7 +12,7 @@ const routeId = route.params.id as string;
 const client = useSupabaseClient();
 const { deleteBoard } = useBoardStore();
 
-const { data: board } = await useAsyncData("boards", async () => {
+const { data: board } = await useAsyncData("board-data", async () => {
 	const { data } = await client.from("boards").select("*, columns(*, tasks(*, subtasks(*)))").eq("id", routeId).order("created_at").single();
 	return data as unknown as Board;
 });
