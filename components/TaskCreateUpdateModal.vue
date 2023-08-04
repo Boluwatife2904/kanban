@@ -19,28 +19,36 @@ interface Emits {
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 const client = useSupabaseClient();
+const authClient = useSupabaseAuthClient();
 const user = useSupabaseUser();
+const user_id = user.value?.id as string;
 
-const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id: user.value?.id ?? "", board_id: props.boardId });
+const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id, board_id: props.boardId });
 const subtasks = ref([
 	{ id: uuidv4(), title: "", isCompleted: false },
 	{ id: uuidv4(), title: "", isCompleted: false },
 ]);
+const subtasksToBeDeleted = ref<string[]>([]);
 if (props.view === "edit-task" && props.task) {
 	newTask.title = props.task.title;
 	newTask.description = props.task.description;
 	newTask.status = props.task.status;
 	newTask.id = props.task.id;
-	subtasks.value = props.task.subtasks.map(({ id, title, isCompleted }) => ({ id, title, isCompleted }))
+	subtasks.value = props.task.subtasks.map(({ id, title, isCompleted }) => ({ id, title, isCompleted }));
 }
 const isLoading = ref(false);
 
 const createOrUpdateTask = async () => {
 	isLoading.value = true;
-	const mappedSubtasks = subtasks.value.map(({ id, title, isCompleted }) => {
-		return { id, title, isCompleted, user_id: user.value?.id ?? "", board_id: props.boardId, column_id: newTask.status, task_id: newTask.id };
-	});
+	const mappedSubtasks = subtasks.value
+		.map(({ id, title, isCompleted }) => {
+			return { id, title, isCompleted, user_id, board_id: props.boardId, column_id: newTask.status, task_id: newTask.id };
+		})
+		.filter(({ title }) => !!title);
 	const { error: taskError } = await client.from("tasks").upsert(newTask);
+	if (subtasksToBeDeleted.value.length > 0) {
+		await client.from("subtasks").delete().in("id", subtasksToBeDeleted.value);
+	}
 	const { error: subtasksError } = await client.from("subtasks").upsert(mappedSubtasks);
 	if (taskError || subtasksError) {
 		isLoading.value = false;
@@ -57,8 +65,10 @@ const addNewSubtask = () => {
 	subtasks.value.push({ id: uuidv4(), title: "", isCompleted: false });
 };
 
-const removeSubtask = (taskTitle: string) => {
-	subtasks.value = subtasks.value.filter((subtask) => subtask.title !== taskTitle);
+const removeSubtask = (subtaskId: string) => {
+	const subtaskIndex = props.task.subtasks.findIndex((subtask) => subtask.id === subtaskId);
+	if (subtaskIndex > -1) subtasksToBeDeleted.value.push(subtaskId);
+	subtasks.value = subtasks.value.filter((subtask) => subtask.id !== subtaskId);
 };
 </script>
 
@@ -79,7 +89,7 @@ recharge the batteries a little."
 						<div class="task-form__subtasks flex flex-column">
 							<div v-for="(subtask, index) in subtasks" :key="subtask.id" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
-								<button @click="removeSubtask(subtask.title)"><IconsClose /></button>
+								<button :disabled="subtasks.length === 1 && index === 0" @click="removeSubtask(subtask.id)"><IconsClose /></button>
 							</div>
 							<BaseButton type="button" variant="secondary" @click="addNewSubtask">+ Add New Subtask</BaseButton>
 						</div>

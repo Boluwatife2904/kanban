@@ -9,3 +9,4 @@ export default defineNuxtPlugin(() => {
 		setTheme(hasDarkPreference ? "dark-mode" : "light-mode");
 	}
 });
+ 
