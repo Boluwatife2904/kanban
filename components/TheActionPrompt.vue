@@ -7,8 +7,8 @@ interface Props {
 }
 
 interface Emits {
-	(event: "confirm-action"): void;
-	(event: "cancel-action"): void;
+	(event: "confirm-action",  id?: string): void;
+	(event: "cancel-action",): void;
 }
 
 const emits = defineEmits<Emits>();

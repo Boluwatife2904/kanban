@@ -72,8 +72,4 @@ useListen("notify", (notification: { type: string; message: string }) => {
 		}
 	}
 }
-
-.flex-shrink-0 {
-	flex-shrink: 0;
-}
 </style>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Task, ItemToDelete, Board, TaskWithSubtasks } from "@/types";
+import type { ItemToDelete, Board, Task, TaskWithSubtasks } from "@/types";
 import { useEvent } from "@/composables/useEventBus";
+import { VueDraggableNext } from "vue-draggable-next";
 
 definePageMeta({
 	layout: "dashboard",
@@ -11,22 +12,36 @@ const route = useRoute();
 const routeId = route.params.id as string;
 const client = useSupabaseClient();
 const { deleteBoard } = useBoardStore();
+const board = ref<Board | null>(null);
+const recentChangedColumnId = ref("");
 
-const { data: board, refresh: refreshBoardData } = await useAsyncData("board-data", async () => {
-	const { data } = await client.from("boards").select("*, columns(*, tasks(*, subtasks(*)))").eq("id", routeId).order("created_at").single();
+const { data: boardData, refresh: refreshBoardData } = await useAsyncData("board-data", async () => {
+	const { data } = await client.from("boards").select("*, columns(*, tasks(*, subtasks(*)))").eq("id", routeId).single();
 	return data as unknown as Board;
 });
 
-if (!board.value) {
+if (!boardData.value) {
 	throw createError({ statusCode: 404, statusMessage: "Board Not Found" });
 }
-
-const selectedTask = ref<Task | null>(null);
+if (boardData.value) {
+	board.value = {
+		title: boardData.value.title,
+		id: boardData.value.id,
+		columns: boardData.value.columns.map((column) => {
+			return {
+				id: column.id,
+				name: column.name,
+				tasks: [...column.tasks].sort((a, b) => a.order - b.order),
+			};
+		}),
+	};
+}
+const selectedTask = ref<TaskWithSubtasks | null>(null);
 const showBoardOptions = ref(false);
 const activeModal = ref("");
 const itemToDelete = reactive<ItemToDelete>({ id: "", type: "", name: "" });
 const taskColumns = computed(() => {
-	return board.value!.columns.map(({ id, name }: { id: string; name: string }) => ({ value: id, content: name }));
+	return board.value!.columns.map(({ id, name, tasks }: { id: string; name: string, tasks: any[] }) => ({ value: id, content: name, count: tasks.length }));
 });
 
 const setActiveModal = (modalType: string) => {
@@ -51,16 +66,17 @@ const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
 	setActiveModal(`delete-${type}`);
 };
 
-const confirmDeletion = () => {
+const confirmDeletion = async () => {
 	setActiveModal("");
 	if (itemToDelete.type === "board") {
 		deleteBoard(itemToDelete.id);
 		navigateTo({ name: "dashboard" }, { replace: true });
 	} else if (itemToDelete.type === "task") {
-		const taskColumn = board.value?.columns.find((column) => column.id === selectedTask.value?.status);
+		const taskColumn = board.value?.columns.find((column) => (column.id === recentChangedColumnId.value ? recentChangedColumnId.value : selectedTask.value?.status));
 		if (taskColumn) {
 			taskColumn.tasks = taskColumn?.tasks.filter((task) => task.id !== itemToDelete.id);
 		}
+		recentChangedColumnId.value = "";
 	}
 	useEvent("notify", { type: "success", message: `${capitalizeFirstLetter(itemToDelete.type)} have been successfully deleted!` });
 };
@@ -72,6 +88,16 @@ const addNewTaskToColumn = (task: TaskWithSubtasks) => {
 
 const updateTaskInColumn = async (task: TaskWithSubtasks) => {
 	await refreshBoardData();
+};
+
+const reorderTasks = async (columnId: string, event: any) => {
+	if (event.added || event.moved) {
+		recentChangedColumnId.value = columnId;
+		const column = board.value?.columns.find((column) => column.id === columnId);
+		const columnTasks = column?.tasks.map(({ id }, index) => ({ id, status: columnId, order: index }));
+		await client.from("tasks").upsert(columnTasks);
+		await refreshBoardData();
+	}
 };
 </script>
 
@@ -103,11 +129,13 @@ const updateTaskInColumn = async (task: TaskWithSubtasks) => {
 			<div v-if="board && board.columns.length > 0" class="single-board__content flex">
 				<section class="single-board__column" v-for="column in board.columns" :key="column.id">
 					<h6 class="medium-grey-text heading-s text-uppercase single-board__column__name flex items-center">
-						<span class="single-board__column__color block border-rounded"></span>
+						<span class="single-board__column__color block border-rounded flex-shrink-0"></span>
 						{{ column.name }} ({{ column.tasks.length }})
 					</h6>
-					<div v-if="column.tasks && column.tasks.length > 0" class="single-board__tasks flex flex-column">
-						<DashboardBoardCard v-for="task in column.tasks" :key="task.title" :task="task" @show-task="showSingleTask(column.id, task.id)" />
+					<div class="single-board__tasks__wrapper">
+						<VueDraggableNext class="single-board__tasks flex flex-column" v-model="column.tasks" group="tasks" @change="reorderTasks(column.id, $event)">
+							<DashboardBoardCard v-for="task in column.tasks" :key="task.id" :task="task" @show-task="showSingleTask(column.id, task.id)" />
+						</VueDraggableNext>
 					</div>
 				</section>
 				<button class="single-board__column single-board__column--add medium-grey-text heading-xl border-s" @click="setActiveModal('edit-board')">+ New Column</button>
@@ -230,6 +258,7 @@ const updateTaskInColumn = async (task: TaskWithSubtasks) => {
 
 	&__tasks {
 		gap: 2rem;
+		min-height: calc(100vh - 10rem);
 	}
 }
 </style>

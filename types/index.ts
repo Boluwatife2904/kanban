@@ -15,6 +15,7 @@ export interface Task {
 	status: string;
 	user_id: string;
 	board_id: string;
+	order: number;
 }
 
 export interface TaskWithSubtasks extends Task {
@@ -49,4 +50,5 @@ export interface ItemToDelete {
 export interface Option {
 	value: string;
 	content: string;
+	count?: number
 }

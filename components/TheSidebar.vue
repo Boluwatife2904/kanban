@@ -6,7 +6,9 @@ const { logout } = useStore();
 <template>
 	<aside class="sidebar flex flex-column">
 		<div class="sidebar__logo cursor-pointer" @click="navigateTo({ name: 'dashboard' })">
-			<TheLogo />
+			<ClientOnly>
+				<TheLogo />
+			</ClientOnly>
 		</div>
 		<DashboardBoards />
 		<div class="sidebar__theme">

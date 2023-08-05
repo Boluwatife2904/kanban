@@ -19,11 +19,10 @@ interface Emits {
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 const client = useSupabaseClient();
-const authClient = useSupabaseAuthClient();
 const user = useSupabaseUser();
 const user_id = user.value?.id as string;
 
-const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id, board_id: props.boardId });
+const newTask: Task = reactive({ id: uuidv4(), title: "", description: "", status: "", user_id, board_id: props.boardId, order: 0 });
 const subtasks = ref([
 	{ id: uuidv4(), title: "", isCompleted: false },
 	{ id: uuidv4(), title: "", isCompleted: false },
@@ -45,7 +44,8 @@ const createOrUpdateTask = async () => {
 			return { id, title, isCompleted, user_id, board_id: props.boardId, column_id: newTask.status, task_id: newTask.id };
 		})
 		.filter(({ title }) => !!title);
-	const { error: taskError } = await client.from("tasks").upsert(newTask);
+	const selectedColumnCount = props.options.find((option) => option.value === newTask.status)?.count ?? 0;
+	const { error: taskError } = await client.from("tasks").upsert({ ...newTask, order: selectedColumnCount+ 1 });
 	if (subtasksToBeDeleted.value.length > 0) {
 		await client.from("subtasks").delete().in("id", subtasksToBeDeleted.value);
 	}
@@ -66,8 +66,10 @@ const addNewSubtask = () => {
 };
 
 const removeSubtask = (subtaskId: string) => {
-	const subtaskIndex = props.task.subtasks.findIndex((subtask) => subtask.id === subtaskId);
-	if (subtaskIndex > -1) subtasksToBeDeleted.value.push(subtaskId);
+	if (props.task) {
+		const subtaskIndex = props.task.subtasks.findIndex((subtask) => subtask.id === subtaskId);
+		if (subtaskIndex > -1) subtasksToBeDeleted.value.push(subtaskId);
+	}
 	subtasks.value = subtasks.value.filter((subtask) => subtask.id !== subtaskId);
 };
 </script>
@@ -89,7 +91,7 @@ recharge the batteries a little."
 						<div class="task-form__subtasks flex flex-column">
 							<div v-for="(subtask, index) in subtasks" :key="subtask.id" class="task-form__subtask flex items-center">
 								<BaseInput v-model="subtask.title" :placeholder="index % 2 === 0 ? 'e.g. Make coffee' : 'e.g. Drink coffee & smile'" />
-								<button :disabled="subtasks.length === 1 && index === 0" @click="removeSubtask(subtask.id)"><IconsClose /></button>
+								<button type="button" :disabled="subtasks.length === 1 && index === 0" @click="removeSubtask(subtask.id)"><IconsClose /></button>
 							</div>
 							<BaseButton type="button" variant="secondary" @click="addNewSubtask">+ Add New Subtask</BaseButton>
 						</div>

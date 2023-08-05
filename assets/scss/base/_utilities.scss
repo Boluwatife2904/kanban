@@ -113,3 +113,7 @@ $text-transformations: capitalize, uppercase;
 		display: block;
 	}
 }
+
+.flex-shrink-0 {
+	flex-shrink: 0;
+}
