@@ -76,19 +76,16 @@ const buttonClasses = computed(() => {
 .loader {
 	width: 1.6rem;
 	height: 1.6rem;
-	border: 0.2rem dashed #fff;
+	border: 0.1rem solid #fff;
+	border-bottom-color: transparent;
 	border-radius: 50%;
 	display: inline-block;
-	position: relative;
 	box-sizing: border-box;
-	animation: rotation 1.2s linear infinite;
+	animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
+	to {
 		transform: rotate(360deg);
 	}
 }
