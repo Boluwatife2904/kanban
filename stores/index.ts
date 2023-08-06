@@ -1,8 +1,8 @@
 export const useStore = defineStore("store", () => {
-	const authClient = useSupabaseAuthClient();
+	const supabaseClient = useSupabaseClient();
 
 	const logout = () => {
-		authClient.auth.signOut().then(() => {
+		supabaseClient.auth.signOut().then(() => {
 			useEvent("notify", { type: "success", message: "You have been logged out successfully!" });
 			navigateTo({ name: "index" }, { replace: true });
 		});

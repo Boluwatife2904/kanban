@@ -10,7 +10,7 @@
 	},
 	"devDependencies": {
 		"@nuxt/devtools": "latest",
-		"@nuxtjs/supabase": "^0.3.8",
+		"@nuxtjs/supabase": "^1.0.2",
 		"@pinia/nuxt": "^0.4.11",
 		"@types/node": "^18",
 		"@types/uuid": "^9.0.2",

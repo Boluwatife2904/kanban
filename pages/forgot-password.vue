@@ -5,7 +5,7 @@ definePageMeta({
 });
 
 const config = useRuntimeConfig();
-const authClient = useSupabaseAuthClient();
+const supabaseClient = useSupabaseClient();
 const { selectedTheme } = useTheme();
 const email = ref("");
 const isLoading = ref(false);
@@ -13,7 +13,7 @@ const isLoading = ref(false);
 const sendResetInstructions = async () => {
 	const baseUrl = config.public.frontendBaseUrl;
 	isLoading.value = true;
-	const { error } = await authClient.auth.resetPasswordForEmail(email.value, { redirectTo: `${baseUrl}/change-password` });
+	const { error } = await supabaseClient.auth.resetPasswordForEmail(email.value, { redirectTo: `${baseUrl}/change-password` });
 	if (error) {
 		isLoading.value = false;
 		useEvent("notify", { type: "error", message: error.message });

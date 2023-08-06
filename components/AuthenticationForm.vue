@@ -2,8 +2,8 @@
 interface Props {
 	mode: "login" | "signup";
 }
-const authClient = useSupabaseAuthClient();
-const { fetchBoards } = useBoardStore()
+const supabaseClient = useSupabaseClient();
+const { fetchBoards } = useBoardStore();
 const { mode = "login" } = defineProps<Props>();
 
 const formData = reactive({
@@ -16,7 +16,7 @@ const isLoading = ref(false);
 const loginOrSignup = async () => {
 	isLoading.value = true;
 	if (mode === "login") {
-		const { error } = await authClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
+		const { error } = await supabaseClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
 		if (error) {
 			isLoading.value = false;
 			useEvent("notify", { type: "error", message: error.message });
@@ -27,7 +27,7 @@ const loginOrSignup = async () => {
 		navigateTo({ name: "dashboard" }, { replace: true });
 		isLoading.value = false;
 	} else if (mode === "signup") {
-		const { error } = await authClient.auth.signUp({ email: formData.email, password: formData.password });
+		const { error } = await supabaseClient.auth.signUp({ email: formData.email, password: formData.password });
 		if (error) {
 			isLoading.value = false;
 			useEvent("notify", { type: "error", message: error.message });
@@ -42,7 +42,7 @@ const loginOrSignup = async () => {
 const loginWithGoogle = async () => {
 	const config = useRuntimeConfig();
 	const baseUrl = config.public.frontendBaseUrl;
-	await authClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${baseUrl}/provider` } });
+	await supabaseClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${baseUrl}/provider` } });
 };
 const gotoForgotPassword = () => navigateTo({ name: "forgot-password" });
 const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : navigateTo({ name: "index" }));
