@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ItemToDelete, Board, Task, TaskWithSubtasks } from "@/types";
-import { useEvent } from "@/composables/useEventBus";
+import type { ItemToDelete, Board, TaskWithSubtasks } from "@/types";
 import { VueDraggableNext } from "vue-draggable-next";
 
 definePageMeta({

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useListen } from "@/composables/useEventBus";
-
-const sidebarIsHidden = ref(false);
+const { logout } = useStore();
 
 const route = useRoute();
+const sidebarIsHidden = ref(false);
 const showMobileSidebar = ref(false);
 const activeModal = ref("");
 
@@ -47,6 +46,10 @@ useListen("add-board", () => {
 					<div class="sidebar--mobile__theme">
 						<ThemeToggler />
 					</div>
+					<button class="boards__item heading-m flex items-center w-100" @click="logout">
+						<IconsSignout />
+						Logout
+					</button>
 				</div>
 			</template>
 		</BaseModal>
@@ -111,6 +114,7 @@ useListen("add-board", () => {
 
 .sidebar--mobile {
 	padding-top: 1.6rem;
+	padding-bottom: 2rem;
 
 	&__theme {
 		padding: 1.6rem;
