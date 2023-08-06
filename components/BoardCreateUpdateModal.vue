@@ -25,6 +25,7 @@ const columns = ref([
 const isLoading = ref(false);
 
 if (props.view === "edit-board" && props.board) {
+	boardData.id = props.board.id;
 	boardData.title = props.board.title;
 	columns.value = props.board.columns.map(({ name, id }) => {
 		return { name, id };
@@ -37,8 +38,8 @@ const createOrUpdateBoard = async () => {
 		const newColumns = columns.value.map(({ name, id }) => {
 			return { name, id, board_id: boardData.id, user_id: user.value?.id };
 		});
-		const { error: boardError } = await client.from("boards").insert(boardData);
-		const { error: columnsError } = await client.from("columns").insert(newColumns);
+		const { error: boardError } = await client.from("boards").upsert(boardData);
+		const { error: columnsError } = await client.from("columns").upsert(newColumns);
 		if (boardError || columnsError) {
 			isLoading.value = false;
 			useEvent("notify", { type: "error", message: "An error occurred trying to create the board. Please try again." });
@@ -58,12 +59,17 @@ const addNewColumn = () => {
 const removeColumn = (columnId: string) => {
 	columns.value = columns.value.filter((column) => column.id !== columnId);
 };
+
+const haveMadeChanges = computed(() => {
+	return props.view === "edit-board" && (props.board?.title !== boardData.title || JSON.stringify(columns.value) !== JSON.stringify(props.board.columns.map(({ name, id }) => ({ name, id }))));
+});
 </script>
 
 <template>
 	<LazyBaseModal :show="show" @close-modal="$emit('close-modal')">
 		<template #content>
 			<div class="board-form">
+				{{ haveMadeChanges }}
 				<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
 				<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
 					<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" />
@@ -76,7 +82,7 @@ const removeColumn = (columnId: string) => {
 							<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 						</div>
 					</BaseInputWrapper>
-					<BaseButton :is-loading="isLoading">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
+					<BaseButton :is-loading="isLoading" :disabled="!haveMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
 				</form>
 			</div>
 		</template>

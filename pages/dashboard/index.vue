@@ -64,8 +64,14 @@ const viewBoard = (boardId: string) => {
 	&__boards {
 		&__wrapper {
 			gap: 3rem;
-			grid-template-columns: repeat(3, 1fr);
 
+			@media screen and (min-width: 600px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			@media screen and (min-width: 992px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
 
 			li {
 				background-color: var(--sidebar-background);
