@@ -23,8 +23,7 @@ const viewBoard = (boardId: string) => {
 				<h4 class="primary-text heading-l">Hello {{ user?.email?.split("@")[0] }} 👋🏽,</h4>
 				<p class="primary-text body-l">Welcome back to Kanban! <span class="logout cursor-pointer" @click="logout">Logout</span></p>
 			</div>
-			<div class="dashboard__boards">
-				<h4 class="dashboard__boards__heading"></h4>
+			<div v-if="boards.length > 0" class="dashboard__boards">
 				<ul class="dashboard__boards__wrapper grid">
 					<li v-for="board in boards" :key="board.id" class="border-xs flex flex-column" @click="viewBoard(board.id)">
 						<h4 class="primary-text heading-m">{{ board.title }}</h4>
@@ -32,6 +31,7 @@ const viewBoard = (boardId: string) => {
 					</li>
 				</ul>
 			</div>
+			<LazyEmptyState v-else type="board" />
 		</div>
 	</div>
 </template>

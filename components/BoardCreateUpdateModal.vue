@@ -60,8 +60,8 @@ const removeColumn = (columnId: string) => {
 	columns.value = columns.value.filter((column) => column.id !== columnId);
 };
 
-const haveMadeChanges = computed(() => {
-	return props.view === "edit-board" && (props.board?.title !== boardData.title || JSON.stringify(columns.value) !== JSON.stringify(props.board.columns.map(({ name, id }) => ({ name, id }))));
+const haveNotMadeChanges = computed(() => {
+	return props.view === "edit-board" && props.board?.title === boardData.title && JSON.stringify(columns.value) === JSON.stringify(props.board.columns.map(({ name, id }) => ({ name, id })));
 });
 </script>
 
@@ -69,7 +69,6 @@ const haveMadeChanges = computed(() => {
 	<LazyBaseModal :show="show" @close-modal="$emit('close-modal')">
 		<template #content>
 			<div class="board-form">
-				{{ haveMadeChanges }}
 				<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
 				<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
 					<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" />
@@ -82,7 +81,7 @@ const haveMadeChanges = computed(() => {
 							<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 						</div>
 					</BaseInputWrapper>
-					<BaseButton :is-loading="isLoading" :disabled="!haveMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
+					<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
 				</form>
 			</div>
 		</template>
