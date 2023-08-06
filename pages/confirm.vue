@@ -6,7 +6,7 @@ const showAlert = ref(true);
 watchEffect(async () => {
 	if (user.value) {
 		await fetchBoards();
-		if(showAlert.value)useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
+		if (showAlert.value) useEvent("notify", { type: "success", message: "Signed in successfully. Welcome back!" });
 		showAlert.value = false;
 		return navigateTo({ name: "dashboard" }, { replace: true });
 	}

@@ -42,7 +42,7 @@ const loginOrSignup = async () => {
 const loginWithGoogle = async () => {
 	const config = useRuntimeConfig();
 	const baseUrl = config.public.frontendBaseUrl;
-	await supabaseClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${baseUrl}/provider` } });
+	await supabaseClient.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${baseUrl}/confirm` } });
 };
 const gotoForgotPassword = () => navigateTo({ name: "forgot-password" });
 const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : navigateTo({ name: "index" }));
