@@ -81,29 +81,4 @@ const showModal = ref(false);
 	}
 }
 
-.item-header {
-	margin-bottom: 0.8rem;
-	color: var(--label-color);
-}
-
-.text {
-	color: var(--primary-text);
-
-	@media screen and (min-width: 600px) {
-		grid-template-columns: 40% 60%;
-	}
-
-	> div {
-		gap: 2rem;
-	}
-}
-
-.delete-actions {
-	gap: 1.6rem;
-	margin-top: 2.4rem;
-
-	@media screen and (min-width: 600px) {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
 </style>

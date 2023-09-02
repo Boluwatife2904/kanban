@@ -9,6 +9,7 @@ interface Props {
 }
 interface Emits {
 	(event: "close-modal"): void;
+	(event: "refresh-board"): void;
 }
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
@@ -23,6 +24,8 @@ const columns = ref([
 	{ name: "", id: uuidv4() },
 ]);
 const isLoading = ref(false);
+const idOfColumnToDelete = ref("");
+const columnsToBeDeleted = ref<string[]>([]);
 
 if (props.view === "edit-board" && props.board) {
 	boardData.id = props.board.id;
@@ -33,23 +36,31 @@ if (props.view === "edit-board" && props.board) {
 }
 
 const createOrUpdateBoard = async () => {
-	if (props.view === "add-board") {
-		isLoading.value = true;
-		const newColumns = columns.value.map(({ name, id }) => {
+	isLoading.value = true;
+	const newColumns = columns.value
+		.map(({ name, id }) => {
 			return { name, id, board_id: boardData.id, user_id: user.value?.id };
-		});
-		const { error: boardError } = await client.from("boards").upsert(boardData);
-		const { error: columnsError } = await client.from("columns").upsert(newColumns);
-		if (boardError || columnsError) {
-			isLoading.value = false;
-			useEvent("notify", { type: "error", message: "An error occurred trying to create the board. Please try again." });
-			return;
-		}
+		})
+		.filter((column) => column.name);
+	const { error: boardError } = await client.from("boards").upsert(boardData);
+	if (columnsToBeDeleted.value.length > 0) {
+		await client.from("columns").delete().in("id", columnsToBeDeleted.value);
+	}
+	const { error: columnsError } = await client.from("columns").upsert(newColumns);
+	if (boardError || columnsError) {
+		isLoading.value = false;
+		useEvent("notify", { type: "error", message: `An error occurred trying to ${props.view === "edit-board" ? "update" : "create"} this board. Please try again.` });
+		return;
+	}
+	if (props.view === "add-board") {
 		addBoard(boardData);
 		useEvent("notify", { type: "success", message: "New board created successfully." });
-		isLoading.value = false;
-		emits("close-modal");
+	} else if (props.view === "edit-board") {
+		emits("refresh-board");
+		useEvent("notify", { type: "success", message: "Board updated successfully." });
 	}
+	isLoading.value = false;
+	emits("close-modal");
 };
 
 const addNewColumn = () => {
@@ -57,7 +68,18 @@ const addNewColumn = () => {
 };
 
 const removeColumn = (columnId: string) => {
-	columns.value = columns.value.filter((column) => column.id !== columnId);
+	const columnExists = props.board?.columns.some((column) => column.id === columnId);
+	if (columnExists) {
+		idOfColumnToDelete.value = columnId;
+	} else {
+		columns.value = columns.value.filter((column) => column.id !== columnId);
+	}
+};
+
+const confirmColumnDeletion = () => {
+	columnsToBeDeleted.value.push(idOfColumnToDelete.value);
+	columns.value = columns.value.filter((column) => column.id !== idOfColumnToDelete.value);
+	idOfColumnToDelete.value = "";
 };
 
 const haveNotMadeChanges = computed(() => {
@@ -68,21 +90,31 @@ const haveNotMadeChanges = computed(() => {
 <template>
 	<LazyBaseModal :show="show" @close-modal="$emit('close-modal')">
 		<template #content>
-			<div class="board-form">
-				<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
-				<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
-					<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" />
-					<BaseInputWrapper label="Columns">
-						<div class="board-form__columns flex flex-column">
-							<div v-for="(item, index) in columns" :key="item.id" class="board-form__column flex items-center">
-								<BaseInput v-model="item.name" type="text" :id="item.name" :placeholder="index % 2 === 0 ? 'e.g. Todo' : 'e.g. Doing'" />
-								<button :disabled="columns.length === 1 && index === 0" type="button" @click="removeColumn(item.id)"><IconsClose /></button>
+			<div class="position-relative">
+				<div class="board-form">
+					<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
+					<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
+						<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" />
+						<BaseInputWrapper label="Columns">
+							<div class="board-form__columns flex flex-column">
+								<div v-for="(item, index) in columns" :key="item.id" class="board-form__column flex items-center">
+									<BaseInput v-model="item.name" type="text" :id="item.name" :placeholder="index % 2 === 0 ? 'e.g. Todo' : 'e.g. Doing'" />
+									<button :disabled="columns.length === 1 && index === 0" type="button" @click="removeColumn(item.id)"><IconsClose /></button>
+								</div>
+								<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 							</div>
-							<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
-						</div>
-					</BaseInputWrapper>
-					<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
-				</form>
+						</BaseInputWrapper>
+						<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
+					</form>
+				</div>
+				<div v-if="!!idOfColumnToDelete" class="confirmation flex flex-column position-absolute">
+					<h4 class="confirmation__title heading-l destructive-text">Delete this column?</h4>
+					<p class="confirmation__message body-l medium-grey-text">Are you sure you want to delete this column? This action will remove all tasks belonging to this column and this action cannot be reversed once you save changes.</p>
+					<div class="confirmation__actions grid">
+						<BaseButton variant="destructive" size="large" @click="confirmColumnDeletion"> Delete </BaseButton>
+						<BaseButton variant="secondary" size="large" @click="idOfColumnToDelete = ''"> Cancel </BaseButton>
+					</div>
+				</div>
 			</div>
 		</template>
 	</LazyBaseModal>
@@ -115,6 +147,25 @@ const haveNotMadeChanges = computed(() => {
 
 		span {
 			min-width: 1.5rem;
+		}
+	}
+}
+
+.confirmation {
+	background-color: var(--body-background);
+	top: -3.2rem;
+	left: -3.2rem;
+	height: calc(100% + 6.4rem);
+	width: calc(100% + 6.4rem);
+	padding: 3.2rem;
+	gap: 2.4rem;
+
+	&__actions {
+		gap: 1.6rem;
+		margin-top: auto;
+
+		@media screen and (min-width: 600px) {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 }

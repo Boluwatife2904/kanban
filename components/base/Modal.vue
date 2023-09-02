@@ -72,6 +72,7 @@ const closeModal = () => {
 	&__body {
 		margin: 0;
 		background-color: var(--body-background);
+		overflow: hidden;
 
 		&--padded {
 			padding: 3.2rem;

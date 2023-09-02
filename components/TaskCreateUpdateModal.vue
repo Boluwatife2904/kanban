@@ -38,6 +38,10 @@ if (props.view === "edit-task" && props.task) {
 const isLoading = ref(false);
 
 const createOrUpdateTask = async () => {
+	if (newTask.status === "" || newTask.title === "") {
+		useEvent("notify", { type: "error", message: "Please fill the required fields" });
+		return;
+	}
 	isLoading.value = true;
 	const mappedSubtasks = subtasks.value
 		.map(({ id, title, isCompleted }) => {
@@ -45,7 +49,7 @@ const createOrUpdateTask = async () => {
 		})
 		.filter(({ title }) => !!title);
 	const selectedColumnCount = props.options.find((option) => option.value === newTask.status)?.count ?? 0;
-	const { error: taskError } = await client.from("tasks").upsert({ ...newTask, order: selectedColumnCount+ 1 });
+	const { error: taskError } = await client.from("tasks").upsert({ ...newTask, order: selectedColumnCount + 1 });
 	if (subtasksToBeDeleted.value.length > 0) {
 		await client.from("subtasks").delete().in("id", subtasksToBeDeleted.value);
 	}
@@ -85,8 +89,7 @@ const removeSubtask = (subtaskId: string) => {
 						v-model="newTask.description"
 						label="Description"
 						placeholder="e.g. It’s always good to take a break. This 15 minute break will 
-recharge the batteries a little."
-					/>
+recharge the batteries a little." />
 					<BaseInputWrapper label="Subtasks">
 						<div class="task-form__subtasks flex flex-column">
 							<div v-for="(subtask, index) in subtasks" :key="subtask.id" class="task-form__subtask flex items-center">

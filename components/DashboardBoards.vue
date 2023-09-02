@@ -11,7 +11,9 @@ const { boards } = storeToRefs(useBoardStore());
 			<li v-for="board in boards" :key="board.id">
 				<NuxtLink :to="{ name: 'dashboard-board-id', params: { id: board.id } }" class="boards__item heading-m flex items-center" :class="{ 'boards__item--active': board.id === $route.params.id }">
 					<IconsBoard />
-					{{ board.title }}
+					<span>
+						{{ board.title }}
+					</span>
 				</NuxtLink>
 			</li>
 		</ul>
@@ -34,6 +36,15 @@ const { boards } = storeToRefs(useBoardStore());
 		height: 100%;
 		max-height: 21rem;
 		overflow-y: scroll;
+
+		span {
+			display: -webkit-box;
+			width: 100%;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 1;
+			overflow: hidden;
+			padding-right: 1rem;
+		}
 	}
 }
 </style>

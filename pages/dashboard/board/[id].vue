@@ -20,13 +20,14 @@ const { data: boardData, refresh: refreshBoardData } = await useAsyncData("board
 });
 
 if (!boardData.value) {
-	throw createError({ statusCode: 404, statusMessage: "Board Not Found" });
+	throw createError({ statusCode: 404, statusMessage: "Board Not Found", fatal: true });
 }
-if (boardData.value) {
+
+const reorderBoardTasks = (boardData: Board) => {
 	board.value = {
-		title: boardData.value.title,
-		id: boardData.value.id,
-		columns: boardData.value.columns.map((column) => {
+		title: boardData.title,
+		id: boardData.id,
+		columns: [...boardData.columns].map((column) => {
 			return {
 				id: column.id,
 				name: column.name,
@@ -34,18 +35,21 @@ if (boardData.value) {
 			};
 		}),
 	};
+};
+
+if (boardData.value) {
+	reorderBoardTasks(boardData.value);
 }
+
 const selectedTask = ref<TaskWithSubtasks | null>(null);
 const showBoardOptions = ref(false);
 const activeModal = ref("");
 const itemToDelete = reactive<ItemToDelete>({ id: "", type: "", name: "" });
 const taskColumns = computed(() => {
-	return board.value!.columns.map(({ id, name, tasks }: { id: string; name: string, tasks: any[] }) => ({ value: id, content: name, count: tasks.length }));
+	return board.value!.columns.map(({ id, name, tasks }: { id: string; name: string; tasks: any[] }) => ({ value: id, content: name, count: tasks.length }));
 });
 
-const setActiveModal = (modalType: string) => {
-	activeModal.value = modalType;
-};
+const setActiveModal = (modalType: string) => (activeModal.value = modalType);
 
 const showSingleTask = (columnId: string, taskId: string) => {
 	const selectedColumn = board.value?.columns.find((column) => column.id === columnId);
@@ -59,9 +63,7 @@ const showSingleTask = (columnId: string, taskId: string) => {
 };
 
 const deleteBoardOrTask = ({ type, id, name }: ItemToDelete) => {
-	itemToDelete.id = id;
-	itemToDelete.type = type;
-	itemToDelete.name = name;
+	Object.assign(itemToDelete, { id, name, type });
 	setActiveModal(`delete-${type}`);
 };
 
@@ -85,7 +87,7 @@ const addNewTaskToColumn = (task: TaskWithSubtasks) => {
 	board.value?.columns[selectedColumnIndex].tasks.push(task);
 };
 
-const updateTaskInColumn = async (task: TaskWithSubtasks) => {
+const reloadBoardData = async () => {
 	await refreshBoardData();
 };
 
@@ -98,6 +100,10 @@ const reorderTasks = async (columnId: string, event: any) => {
 		await refreshBoardData();
 	}
 };
+
+watch(boardData, (board) => {
+	if (board) reorderBoardTasks(board);
+});
 </script>
 
 <template>
@@ -111,7 +117,7 @@ const reorderTasks = async (columnId: string, event: any) => {
 				</p>
 			</div>
 			<div class="single-board__header--right flex items-center">
-				<BaseButton class="single-board__header__button" size="large" @click="setActiveModal('add-task')">
+				<BaseButton class="single-board__header__button" size="large" :disabled="board.columns.length === 0" @click="setActiveModal('add-task')">
 					<span class="hide-on-mobile">+ Add new task</span>
 					<span class="hide-on-desktop"><IconsPlus /></span>
 				</BaseButton>
@@ -144,8 +150,8 @@ const reorderTasks = async (columnId: string, event: any) => {
 	</div>
 
 	<TaskViewModal v-if="activeModal === 'view-task'" :show="activeModal === 'view-task'" :task="selectedTask" :view="activeModal" @delete-task="deleteBoardOrTask" :options="taskColumns" @edit-task="setActiveModal('edit-task')" @close-modal="setActiveModal('')" />
-	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" :options="taskColumns" :board-id="board?.id ?? ''" @add-task="addNewTaskToColumn" @edit-task="updateTaskInColumn" @close-modal="setActiveModal('')" />
-	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @close-modal="setActiveModal('')" />
+	<TaskCreateUpdateModal v-if="activeModal === 'add-task' || activeModal === 'edit-task'" :show="activeModal === 'add-task' || activeModal === 'edit-task'" :view="activeModal" :task="selectedTask" :options="taskColumns" :board-id="board?.id ?? ''" @add-task="addNewTaskToColumn" @edit-task="reloadBoardData" @close-modal="setActiveModal('')" />
+	<BoardCreateUpdateModal v-if="activeModal === 'edit-board'" :show="activeModal === 'edit-board'" :view="activeModal" :board="board" @refresh-board="reloadBoardData" @close-modal="setActiveModal('')" />
 	<TheActionPrompt :show="activeModal === 'delete-task' || activeModal === 'delete-board'" :item-to-delete="itemToDelete" @confirm-action="confirmDeletion" @cancel-action="setActiveModal('')" />
 </template>
 

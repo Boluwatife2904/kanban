@@ -1,11 +1,28 @@
 <script setup lang="ts">
-const { selectedTheme } = useTheme();
-
 definePageMeta({
 	layout: "auth",
 });
 
-const changeUserPassword = () => {};
+const client = useSupabaseClient();
+const form = reactive({ password: "", confirmPassword: "" });
+
+const changeUserPassword = async () => {
+	if (form.password === "") {
+		useEvent("notify", { type: "error", message: "You need to enter a passoword" });
+		return;
+	}
+	if (form.password !== form.confirmPassword) {
+		useEvent("notify", { type: "error", message: "Passwords do not match!!!" });
+		return;
+	}
+	const { error } = await client.auth.updateUser({ password: form.password });
+	if (error) {
+		useEvent("notify", { type: "error", message: "There was error trying to update your password." });
+		return;
+	}
+	navigateTo({ name: "index " }, { replace: true });
+	useEvent("notify", { type: "error", message: "Your password have been updated successfully." });
+};
 </script>
 
 <template>
@@ -16,8 +33,8 @@ const changeUserPassword = () => {};
 		</div>
 		<div class="change-password__body">
 			<form class="change-password__form flex flex-column" @submit.prevent="changeUserPassword">
-				<BaseInput id="password" label="Enter New Password" placeholder="Enter new password" />
-				<BaseInput id="password" label="Confirm New Password" placeholder="Confirm new password" />
+				<BaseInput v-model.trim="form.password" id="password" type="password" label="Enter New Password" placeholder="Enter new password" />
+				<BaseInput v-model.trim="form.confirmPassword" id="confirmPassword" type="password" label="Confirm New Password" placeholder="Confirm new password" />
 				<BaseButton radius="small">Update password</BaseButton>
 			</form>
 		</div>

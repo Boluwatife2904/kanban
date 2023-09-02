@@ -30,7 +30,7 @@ const deleteTask = () => {
 };
 const updateSubtaskCompletedStatus = async (event: Event) => {
 	const { id, checked } = event.target as HTMLInputElement;
-	await client.from("subtasks").update({ isCompleted: checked }).eq("id", id);
+	await client.from("subtasks").upsert({ id, isCompleted: checked });
 };
 </script>
 
