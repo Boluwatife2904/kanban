@@ -14,6 +14,10 @@ const formData = reactive({
 const isLoading = ref(false);
 
 const loginOrSignup = async () => {
+	if (formData.password === "" || formData.email === "") {
+		useEvent("notify", { type: "error", message: "You need to fill all required fields" });
+		return;
+	}
 	isLoading.value = true;
 	if (mode === "login") {
 		const { error } = await supabaseClient.auth.signInWithPassword({ email: formData.email, password: formData.password });
@@ -68,17 +72,18 @@ const gotoSignup = () => (mode === "login" ? navigateTo({ name: "register" }) : 
 		<span class="or-text body-l">or</span>
 		<div class="authentication-form__body">
 			<form class="authentication-form__form flex flex-column" @submit.prevent="loginOrSignup">
-				<BaseInput v-model="formData.email" id="email" label="Email Address" placeholder="name@company.com" />
-				<BaseInput v-model="formData.password" id="password" label="Password" placeholder="name12345" type="password">
+				<BaseInput v-model.trim="formData.email" id="email" label="Email Address" placeholder="name@company.com" :is-required="true" />
+				<BaseInput v-model.trim="formData.password" id="password" label="Password" placeholder="name12345" type="password" :is-required="true">
 					<template v-if="mode === 'login'" #label><span class="primary-color-text cursor-pointer" @click="gotoForgotPassword">Forgot password?</span></template>
 				</BaseInput>
 				<BaseCheckbox v-if="mode === 'login'" v-model="formData.remember" id="remember" name="remember" label="Remember information" :has-background="false" />
-				<BaseButton radius="small" :is-loading="isLoading">{{ mode === "login" ? "Log in" : "Sign up" }}</BaseButton>
+				<BaseButton radius="small" :is-loading="isLoading" :disabled="!formData.email || !formData.password">{{ mode === "login" ? "Log in" : "Sign up" }}</BaseButton>
 			</form>
 		</div>
 		<div class="authentication-form__footer">
 			<p class="body-m medium-grey-text">
-				{{ mode === "login" ? "Not a member?" : "Already a member?" }} <span class="primary-color-text cursor-pointer" @click="gotoSignup">{{ mode === "login" ? "Sign up" : "Log in" }}</span>
+				{{ mode === "login" ? "Not a member?" : "Already a member?" }}
+				<span class="primary-color-text cursor-pointer" @click="gotoSignup">{{ mode === "login" ? "Sign up" : "Log in" }}</span>
 			</p>
 		</div>
 	</div>
