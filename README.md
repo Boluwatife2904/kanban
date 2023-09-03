@@ -8,7 +8,7 @@ https://github.com/Boluwatife2904/kanban/assets/49585353/78816963-ea77-4342-bf51
 
 ## Deployment
 
-This was built with love 💚 and deployed on Vercel ⚡️. [Click me to view the project 🔗](https://kanban-lemon-ru.vercel.app)
+This was built with love 💚 and deployed on Vercel ⚡️. [Click me to view the project 🔗](https://kanban-lemon-nu.vercel.app)
 
 ## Stack
 
