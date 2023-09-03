@@ -4,8 +4,6 @@ Kanban is a full stack task managegement web application that allows users to cr
 
 This is a challenge from [FrontendMentor](https://www.frontendmentor.io/challenges/kanban-task-management-web-app-wgQLt-HlbB).
 
-https://github.com/Boluwatife2904/kanban/assets/49585353/78816963-ea77-4342-bf51-49495c8fe12e
-
 ## Deployment
 
 This was built with love 💚 and deployed on Vercel ⚡️. [Click me to view the project 🔗](https://kanban-lemon-nu.vercel.app)
