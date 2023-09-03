@@ -107,7 +107,7 @@ const haveNotMadeChanges = computed(() => {
 						<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
 					</form>
 				</div>
-				<div v-if="!!idOfColumnToDelete" class="confirmation flex flex-column position-absolute">
+				<div v-if="!!idOfColumnToDelete" class="confirmation flex flex-column position-absolute border-s">
 					<h4 class="confirmation__title heading-l destructive-text">Delete this column?</h4>
 					<p class="confirmation__message body-l medium-grey-text">Are you sure you want to delete this column? This action will remove all tasks belonging to this column and this action cannot be reversed once you save changes.</p>
 					<div class="confirmation__actions grid">
