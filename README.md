@@ -1,63 +1,43 @@
-# Nuxt 3 Minimal Starter
+# Kanban
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Kanban is a full stack task managegement web application that allows users to create, read, update and delete boards, tasks. 
 
-## Setup
+This is a challenge from [FrontendMentor](https://www.frontendmentor.io/challenges/kanban-task-management-web-app-wgQLt-HlbB).
 
-Make sure to install the dependencies:
+https://res.cloudinary.com/juwon-tech/video/upload/v1693754168/Screen_Recording_2023-09-03_at_15.20.26_s0unab.mov
 
-```bash
-# npm
-npm install
+## Deployment
 
-# pnpm
-pnpm install
+This was built with love 💚 and deployed on Vercel ⚡️. [Click me to view the project 🔗](https://kanban-lemon-ru.vercel.app)
 
-# yarn
-yarn install
-```
+## Stack
 
-## Development Server
+This was built using the Technology Stack of Dreams - Nuxt 3, Supabase and Typescript. Other notable mentions are SCSS (BEM methodology), VueDraggableNext, Pinia.
 
-Start the development server on `http://localhost:3000`:
+## Features
 
-```bash
-# npm
-npm run dev
+This is pretty much packed with every basic feature of a kanban board
 
-# pnpm
-pnpm run dev
+1. Authentication:
+    - Sign in/Sign up with Google or Email and Password
+	- Reset and Change password
 
-# yarn
-yarn dev
-```
+2. CRUD
+	- Create, read, update and delete boards
+	- Create, read, update and delete columns
+	- Create, read, update and delete tasks and subtasks
 
-## Production
+3. Miscellaneous
+	- Light/dark mode
+	- Drag and drop for reordering of tasks and changing of their order
 
-Build the application for production:
+## What I've learnt
 
-```bash
-# npm
-npm run build
+During the course of this project, I've learnt and practised to
+- Break down the entire project into components for reusability purposes
+- Embrace SCSS more
+- Work more with Supabase
 
-# pnpm
-pnpm run build
+## Challanges
 
-# yarn
-yarn build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+During the project, I had issues with motivation and hence I had to drop off the project a couple times. I also had a tiny bit of trouble with deeply nested foreign tables in Supabase.

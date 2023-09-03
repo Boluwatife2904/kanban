@@ -28,11 +28,7 @@ const reorderBoardTasks = (boardData: Board) => {
 		title: boardData.title,
 		id: boardData.id,
 		columns: [...boardData.columns].map((column) => {
-			return {
-				id: column.id,
-				name: column.name,
-				tasks: [...column.tasks].sort((a, b) => a.order - b.order),
-			};
+			return { id: column.id, name: column.name, tasks: [...column.tasks].sort((a, b) => a.order - b.order) };
 		}),
 	};
 };
@@ -110,7 +106,7 @@ watch(boardData, (board) => {
 	<div v-if="board" class="single-board">
 		<div class="single-board__header flex items-center content-space-between">
 			<div class="single-board__header--left flex items-center">
-				<TheLogo variant="mobile" />
+				<TheLogo variant="mobile" class="cursor-pointer" @click="navigateTo({ name: 'dashboard' })" />
 				<p class="single-board__header__title heading-xl primary-text flex items-center" @click="useEvent('show-sidebar')">
 					<span>{{ board.title }}</span>
 					<IconsArrow variant="down" />
@@ -193,6 +189,7 @@ watch(boardData, (board) => {
 				-webkit-line-clamp: 1;
 				-webkit-box-orient: vertical;
 				overflow: hidden;
+				max-width: 40rem;
 			}
 
 			@media screen and (min-width: 768px) {
@@ -226,19 +223,19 @@ watch(boardData, (board) => {
 		max-width: 28rem;
 		flex-shrink: 0;
 
-		&:nth-child(1) {
+		&:nth-child(1n + 0) {
 			.single-board__column__color {
 				background-color: #49c4e5;
 			}
 		}
 
-		&:nth-child(2) {
+		&:nth-child(2n + 0) {
 			.single-board__column__color {
 				background-color: #8471f2;
 			}
 		}
 
-		&:nth-child(3) {
+		&:nth-child(3n + 0) {
 			.single-board__column__color {
 				background-color: #67e2ae;
 			}

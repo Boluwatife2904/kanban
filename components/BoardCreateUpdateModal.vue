@@ -13,7 +13,6 @@ interface Emits {
 }
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
-
 const client = useSupabaseClient();
 const user = useSupabaseUser();
 const { addBoard } = useBoardStore();
@@ -26,27 +25,26 @@ const columns = ref([
 const isLoading = ref(false);
 const idOfColumnToDelete = ref("");
 const columnsToBeDeleted = ref<string[]>([]);
+const haveNotMadeChanges = computed(() => {
+	return props.view === "edit-board" && props.board?.title === boardData.title && JSON.stringify(columns.value) === JSON.stringify(props.board.columns.map(({ name, id }) => ({ name, id })));
+});
 
-if (props.view === "edit-board" && props.board) {
+if (props.view === "edit-board" && props.board) { // update form when updating board
 	boardData.id = props.board.id;
 	boardData.title = props.board.title;
-	columns.value = props.board.columns.map(({ name, id }) => {
-		return { name, id };
-	});
+	columns.value = props.board.columns.map(({ name, id }) => ({ name, id }));
 }
 
 const createOrUpdateBoard = async () => {
-	isLoading.value = true;
-	const newColumns = columns.value
-		.map(({ name, id }) => {
-			return { name, id, board_id: boardData.id, user_id: user.value?.id };
-		})
-		.filter((column) => column.name);
-	const { error: boardError } = await client.from("boards").upsert(boardData);
-	if (columnsToBeDeleted.value.length > 0) {
-		await client.from("columns").delete().in("id", columnsToBeDeleted.value);
+	if (boardData.title === "") {
+		useEvent("notify", { type: "error", message: "Please fill the required fields" });
+		return;
 	}
-	const { error: columnsError } = await client.from("columns").upsert(newColumns);
+	isLoading.value = true;
+	const boardColumns = columns.value.map(({ name, id }) => ({ name, id, board_id: boardData.id, user_id: user.value?.id })).filter((column) => column.name);
+	const { error: boardError } = await client.from("boards").upsert(boardData); // update board data in server
+	if (columnsToBeDeleted.value.length > 0) await client.from("columns").delete().in("id", columnsToBeDeleted.value); // delete columns from server
+	const { error: columnsError } = await client.from("columns").upsert(boardColumns); // update columns in server
 	if (boardError || columnsError) {
 		isLoading.value = false;
 		useEvent("notify", { type: "error", message: `An error occurred trying to ${props.view === "edit-board" ? "update" : "create"} this board. Please try again.` });
@@ -63,17 +61,10 @@ const createOrUpdateBoard = async () => {
 	emits("close-modal");
 };
 
-const addNewColumn = () => {
-	columns.value.push({ name: "", id: uuidv4() });
-};
-
+const addNewColumn = () => columns.value.push({ name: "", id: uuidv4() });
 const removeColumn = (columnId: string) => {
 	const columnExists = props.board?.columns.some((column) => column.id === columnId);
-	if (columnExists) {
-		idOfColumnToDelete.value = columnId;
-	} else {
-		columns.value = columns.value.filter((column) => column.id !== columnId);
-	}
+	columnExists ? (idOfColumnToDelete.value = columnId) : (columns.value = columns.value.filter((column) => column.id !== columnId));
 };
 
 const confirmColumnDeletion = () => {
@@ -81,10 +72,6 @@ const confirmColumnDeletion = () => {
 	columns.value = columns.value.filter((column) => column.id !== idOfColumnToDelete.value);
 	idOfColumnToDelete.value = "";
 };
-
-const haveNotMadeChanges = computed(() => {
-	return props.view === "edit-board" && props.board?.title === boardData.title && JSON.stringify(columns.value) === JSON.stringify(props.board.columns.map(({ name, id }) => ({ name, id })));
-});
 </script>
 
 <template>
@@ -94,7 +81,7 @@ const haveNotMadeChanges = computed(() => {
 				<div class="board-form">
 					<h5 class="board-form__title heading-l primary-text">{{ view === "add-board" ? "Add New" : "Edit" }} Board</h5>
 					<form class="board-form__form flex flex-column" @submit.prevent="createOrUpdateBoard">
-						<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" />
+						<BaseInput v-model="boardData.title" label="Title" placeholder="e.g. Take coffee break" :is-required="true" />
 						<BaseInputWrapper label="Columns">
 							<div class="board-form__columns flex flex-column">
 								<div v-for="(item, index) in columns" :key="item.id" class="board-form__column flex items-center">
@@ -104,15 +91,15 @@ const haveNotMadeChanges = computed(() => {
 								<BaseButton type="button" variant="secondary" @click="addNewColumn">+ Add New column</BaseButton>
 							</div>
 						</BaseInputWrapper>
-						<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
+						<BaseButton :is-loading="isLoading" :disabled="haveNotMadeChanges || boardData.title === ''">{{ view === "add-board" ? "Create New Board" : "Save Changes" }}</BaseButton>
 					</form>
 				</div>
 				<div v-if="!!idOfColumnToDelete" class="confirmation flex flex-column position-absolute border-s">
 					<h4 class="confirmation__title heading-l destructive-text">Delete this column?</h4>
 					<p class="confirmation__message body-l medium-grey-text">Are you sure you want to delete this column? This action will remove all tasks belonging to this column and this action cannot be reversed once you save changes.</p>
 					<div class="confirmation__actions grid">
-						<BaseButton variant="destructive" size="large" @click="confirmColumnDeletion"> Delete </BaseButton>
-						<BaseButton variant="secondary" size="large" @click="idOfColumnToDelete = ''"> Cancel </BaseButton>
+						<BaseButton variant="destructive" size="large" @click="confirmColumnDeletion">Delete</BaseButton>
+						<BaseButton variant="secondary" size="large" @click="idOfColumnToDelete = ''">Cancel</BaseButton>
 					</div>
 				</div>
 			</div>

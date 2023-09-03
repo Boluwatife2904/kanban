@@ -13,7 +13,7 @@ const showModal = ref(false);
 <template>
 	<div class="flex flex-column wrapper">
 		<ThemeToggler />
-		<div class="text grid">
+		<div class="text grid primary-text">
 			<div class="text__header flex flex-column">
 				<h3 class="heading-xl">Heading (XL)</h3>
 				<h4 class="heading-l">Heading (L)</h4>
@@ -40,8 +40,8 @@ const showModal = ref(false);
 			<BaseButton variant="destructive" size="small"> Button Destructive (S) </BaseButton>
 		</div>
 		<div class="grid-wrapper grid">
-			<div class="form-check">
-				<span class="body-m block item-header">Subtask Checkbox</span>
+			<div class="form-check flex flex-column">
+				<span class="body-m block item-header primary-text">Subtask Checkbox</span>
 				<BaseCheckbox v-model="isSelected" id="completeProject" name="completeProject" label="Complete this project" />
 			</div>
 			<BaseInput v-model="selectedText" id="field" name="field" label="Text Field (active)" placeholder="Enter task name" />
@@ -81,4 +81,15 @@ const showModal = ref(false);
 	}
 }
 
+.text__header, .text__body, .text, .delete-actions {
+	gap: 1.6rem;
+}
+
+.form-check {
+	gap: 0.8rem 1.2rem;
+}
+
+.delete-actions {
+	margin-top: 2.4rem;
+}
 </style>

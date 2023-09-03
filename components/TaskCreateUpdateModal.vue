@@ -84,7 +84,7 @@ const removeSubtask = (subtaskId: string) => {
 			<div class="task-form">
 				<h5 class="task-form__title heading-l primary-text">{{ view === "add-task" ? "Add New" : "Edit" }} Task</h5>
 				<form class="task-form__form flex flex-column" @submit.prevent="createOrUpdateTask">
-					<BaseInput v-model="newTask.title" label="Title" placeholder="e.g. Take coffee break" />
+					<BaseInput v-model="newTask.title" label="Title" placeholder="e.g. Take coffee break" :is-required="true" />
 					<BaseTextarea
 						v-model="newTask.description"
 						label="Description"
